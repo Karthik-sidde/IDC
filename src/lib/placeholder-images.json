@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-bg",
+      "description": "Abstract futuristic background for login screen",
+      "imageUrl": "https://picsum.photos/seed/loginbg/1920/1080",
+      "imageHint": "abstract futuristic"
+    },
+    {
+      "id": "event-1",
+      "description": "Corporate tech conference",
+      "imageUrl": "https://picsum.photos/seed/event1/600/400",
+      "imageHint": "tech conference"
+    },
+    {
+      "id": "event-2",
+      "description": "Music festival at night",
+      "imageUrl": "https://picsum.photos/seed/event2/600/400",
+      "imageHint": "music festival"
+    },
+    {
+      "id": "event-3",
+      "description": "Art gallery opening",
+      "imageUrl": "https://picsum.photos/seed/event3/600/400",
+      "imageHint": "art gallery"
+    },
+    {
+      "id": "event-4",
+      "description": "Startup pitch competition",
+      "imageUrl": "https://picsum.photos/seed/event4/600/400",
+      "imageHint": "startup pitch"
+    },
+    {
+      "id": "event-5",
+      "description": "Community workshop",
+      "imageUrl": "https://picsum.photos/seed/event5/600/400",
+      "imageHint": "community workshop"
+    },
+    {
+      "id": "event-6",
+      "description": "Outdoor food market",
+      "imageUrl": "https://picsum.photos/seed/event6/600/400",
+      "imageHint": "food market"
+    },
+    {
+      "id": "event-7",
+      "description": "Web3 and Blockchain Summit",
+      "imageUrl": "https://picsum.photos/seed/event7/600/400",
+      "imageHint": "blockchain summit"
+    },
+    {
+      "id": "event-8",
+      "description": "AI in Healthcare Symposium",
+      "imageUrl": "https://picsum.photos/seed/event8/600/400",
+      "imageHint": "AI healthcare"
+    },
+    {
+      "id": "avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "man portrait"
+    }
+  ]
 }
