@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { addMockEvent } from "@/lib/mock-data";
 import { type Event } from "@/lib/types";
+import { format } from "date-fns";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function NewEventPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
   const [venueDetails, setVenueDetails] = useState("");
   const [ticketTier, setTicketTier] = useState("General Admission");
