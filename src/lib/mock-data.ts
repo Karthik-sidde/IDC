@@ -39,7 +39,7 @@ export const mockUsers: User[] = [
   },
 ];
 
-export const mockEvents: Event[] = [
+const mockEvents: Event[] = [
   {
     id: "event-1",
     title: "Future of Web3 Summit",
@@ -148,6 +148,14 @@ let mockTickets: Ticket[] = [
   },
 ];
 
+// Function to get events
+export const getMockEvents = () => mockEvents;
+
+// Function to add an event
+export const addMockEvent = (event: Event) => {
+  mockEvents.unshift(event);
+};
+
 // Function to get tickets
 export const getMockTickets = () => mockTickets;
 
@@ -155,3 +163,6 @@ export const getMockTickets = () => mockTickets;
 export const addMockTicket = (ticket: Ticket) => {
   mockTickets.push(ticket);
 };
+
+// Also export the raw data for cases where we don't want to use the functions
+export type { User, Event, Ticket, UserRole } from "./types";

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { mockEvents } from "@/lib/mock-data";
+import { getMockEvents } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type Event } from "@/lib/types";
 import {
   AlertDialog,
@@ -46,9 +46,13 @@ import { useToast } from "@/hooks/use-toast";
 export default function AdminEventsPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const [events, setEvents] = useState<Event[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
+  useEffect(() => {
+    setEvents(getMockEvents());
+  }, []);
 
   const handleDeleteClick = (event: Event) => {
     setEventToDelete(event);

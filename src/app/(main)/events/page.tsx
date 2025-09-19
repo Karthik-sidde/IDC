@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { EventCard } from "@/components/events/EventCard";
-import { mockEvents, mockUsers, getMockTickets } from "@/lib/mock-data";
+import { getMockEvents, mockUsers, getMockTickets } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +17,7 @@ import { getPersonalizedEventRecommendations } from "@/ai/flows/personalized-eve
 import { type Event } from "@/lib/types";
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const [events, setEvents] = useState<Event[]>(getMockEvents());
   const [isLoading, setIsLoading] = useState(false);
   const [isRecommended, setIsRecommended] = useState(false);
 
@@ -33,17 +33,18 @@ export default function EventsPage() {
 
     const mockTickets = getMockTickets();
     const userPastEventIds = mockTickets.filter(t => t.userId === user.id).map(t => t.eventId);
-    const userPastEvents = mockEvents.filter(e => userPastEventIds.includes(e.id));
+    const allMockEvents = getMockEvents();
+    const userPastEvents = allMockEvents.filter(e => userPastEventIds.includes(e.id));
     
     try {
       const recommendations = await getPersonalizedEventRecommendations({
         userPastEvents: JSON.stringify(userPastEvents),
         userPreferences: 'Loves tech and music events, preferably on weekends.',
-        allEvents: JSON.stringify(mockEvents),
+        allEvents: JSON.stringify(allMockEvents),
       });
 
       const recommendedIds = JSON.parse(recommendations.recommendedEvents);
-      const recommendedEvents = mockEvents.filter(event => recommendedIds.includes(event.id));
+      const recommendedEvents = allMockEvents.filter(event => recommendedIds.includes(event.id));
       setEvents(recommendedEvents);
     } catch (error) {
       console.error("Failed to get recommendations:", error);
@@ -54,7 +55,7 @@ export default function EventsPage() {
   };
 
   const resetFilters = () => {
-    setEvents(mockEvents);
+    setEvents(getMockEvents());
     setIsRecommended(false);
   };
 

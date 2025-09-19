@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { mockEvents } from "@/lib/mock-data";
+import { getMockEvents } from "@/lib/mock-data";
 import { EventCard } from "@/components/events/EventCard";
 
 
@@ -47,7 +47,7 @@ const LoadingScreen = () => {
 const HomePageContent = () => {
   const router = useRouter();
   
-  const featuredEvents = mockEvents.filter(e => e.date > new Date()).slice(0, 3);
+  const featuredEvents = getMockEvents().filter(e => e.date > new Date()).slice(0, 3);
   
   const containerVariants = {
     hidden: { opacity: 0 },

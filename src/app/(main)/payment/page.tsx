@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard, Lock, Loader2, CheckCircle } from 'lucide-react';
-import { mockEvents, addMockTicket } from '@/lib/mock-data';
+import { getMockEvents, addMockTicket } from '@/lib/mock-data';
 import { UserContext } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import { type Ticket } from '@/lib/types';
@@ -25,7 +25,7 @@ function PaymentPageContent() {
   const [isPaid, setIsPaid] = useState(false);
   
   const eventId = searchParams.get('eventId');
-  const event = mockEvents.find(e => e.id === eventId);
+  const event = getMockEvents().find(e => e.id === eventId);
 
   useEffect(() => {
     if (!user) {

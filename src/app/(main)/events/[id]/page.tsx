@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { notFound, useRouter, usePathname } from 'next/navigation';
-import { mockEvents, mockUsers, addMockTicket, getMockTickets } from '@/lib/mock-data';
+import { getMockEvents, mockUsers, addMockTicket, getMockTickets } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,7 +49,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [justLoggedIn, setJustLoggedIn] = useState(false);
 
 
-  const event = mockEvents.find((e) => e.id === params.id);
+  const event = getMockEvents().find((e) => e.id === params.id);
 
   useEffect(() => {
     if (user && event) {

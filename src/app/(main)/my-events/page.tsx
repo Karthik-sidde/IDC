@@ -1,6 +1,6 @@
 "use client";
 
-import { getMockTickets, mockEvents } from '@/lib/mock-data';
+import { getMockTickets, getMockEvents } from '@/lib/mock-data';
 import {
   Card,
   CardContent,
@@ -29,6 +29,7 @@ export default function MyEventsPage() {
     if (!user) return { upcomingEvents: [], pastEvents: [], userTickets: [] };
 
     const tickets = getMockTickets().filter((t) => t.userId === user.id);
+    const mockEvents = getMockEvents();
     
     const eventsWithTickets = tickets.map((ticket) => {
         const event = mockEvents.find((e) => e.id === ticket.eventId);
