@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -12,6 +13,7 @@ import {
   Users,
   CalendarCheck,
   Activity,
+  ArrowRight,
 } from "lucide-react";
 import {
   Bar,
@@ -25,7 +27,15 @@ import {
   Line,
   LineChart,
 } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
+import { getMockEvents, getMockTickets } from "@/lib/mock-data";
+import { useState, useEffect, useMemo } from "react";
+import { type Event } from "@/lib/types";
+import { isBefore, isSameDay, addDays, format } from "date-fns";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
 
 const revenueData = [
   { month: 'Jan', revenue: 12000 },
@@ -36,32 +46,56 @@ const revenueData = [
   { month: 'Jun', revenue: 32000 },
 ];
 
-const registrationsData = [
-    { name: 'Web3 Summit', registrations: 450, capacity: 500 },
-    { name: 'Music Fest', registrations: 1800, capacity: 2000 },
-    { name: 'Art Show', registrations: 150, capacity: 200 },
-    { name: 'Pitch Night', registrations: 800, capacity: 1000 },
-]
-
 const revenueChartConfig = {
   revenue: {
     label: "Revenue",
     color: "hsl(var(--primary))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-const registrationsChartConfig = {
-    registrations: {
-        label: "Registrations",
-        color: "hsl(var(--primary))",
-    },
-    capacity: {
-        label: "Capacity",
-        color: "hsl(var(--secondary))",
-    }
-} satisfies ChartConfig
 
 export default function AdminDashboardPage() {
+    const [events, setEvents] = useState<Event[]>([]);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [totalRegistrations, setTotalRegistrations] = useState(0);
+
+    useEffect(() => {
+        const mockEvents = getMockEvents();
+        const mockTickets = getMockTickets();
+        setEvents(mockEvents);
+
+        const revenue = mockTickets.reduce((acc, ticket) => acc + ticket.price, 0);
+        setTotalRevenue(revenue);
+        setTotalRegistrations(mockTickets.length);
+    }, []);
+
+    const { ongoingEvents, upcomingEvents } = useMemo(() => {
+        const now = new Date();
+        const ongoing: Event[] = [];
+        const upcoming: Event[] = [];
+
+        events
+            .sort((a,b) => a.date.getTime() - b.date.getTime())
+            .forEach(event => {
+                const eventDate = new Date(event.date);
+                const isPast = isBefore(eventDate, now) && !isSameDay(eventDate, now);
+                 const isOngoing = (isSameDay(eventDate, now) || (isBefore(eventDate, addDays(now, 2)) && isBefore(now, eventDate)) ) && !isPast;
+
+
+                if (isOngoing) {
+                    ongoing.push(event);
+                } else if (!isPast) {
+                    upcoming.push(event);
+                }
+        });
+        return { ongoingEvents: ongoing, upcomingEvents: upcoming };
+    }, [events]);
+    
+    const getRegistrationsForEvent = (eventId: string) => {
+        return getMockTickets().filter(ticket => ticket.eventId === eventId).length;
+    }
+
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -71,7 +105,7 @@ export default function AdminDashboardPage() {
             <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹1,21,000</div>
+            <div className="text-2xl font-bold">₹{totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -81,7 +115,7 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+3,200</div>
+            <div className="text-2xl font-bold">+{totalRegistrations}</div>
             <p className="text-xs text-muted-foreground">+180.1% from last month</p>
           </CardContent>
         </Card>
@@ -91,8 +125,8 @@ export default function AdminDashboardPage() {
             <CalendarCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+6</div>
-            <p className="text-xs text-muted-foreground">+2 since last month</p>
+            <div className="text-2xl font-bold">+{events.length}</div>
+            <p className="text-xs text-muted-foreground">Total events in system</p>
           </CardContent>
         </Card>
         <Card className="glass">
@@ -125,28 +159,59 @@ export default function AdminDashboardPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="font-headline">Event Registrations</CardTitle>
-             <CardDescription>Current registration numbers for upcoming events.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={registrationsChartConfig} className="h-[300px] w-full">
-                <BarChart data={registrationsData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false}/>
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} tickFormatter={(value) => value.substring(0, 8) + '...'}/>
-                    <YAxis tickLine={false} axisLine={false}/>
-                    <ChartTooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
-                    <Legend />
-                    <Bar dataKey="registrations" fill="var(--color-registrations)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="capacity" fill="var(--color-capacity)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+         <div className="space-y-6">
+            <Card className="glass">
+            <CardHeader>
+                <CardTitle className="font-headline">Ongoing & Imminent Events</CardTitle>
+                <CardDescription>Events happening now or in the next 48 hours.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {ongoingEvents.length > 0 ? ongoingEvents.map(event => {
+                    const registrations = getRegistrationsForEvent(event.id);
+                    const capacity = event.tickets.reduce((acc, t) => acc + t.quantity, 0);
+                    const progress = (registrations / capacity) * 100;
+                    return (
+                        <div key={event.id}>
+                            <div className="flex justify-between items-center mb-1">
+                                <Link href={`/events/${event.id}`} className="font-semibold hover:underline truncate">{event.title}</Link>
+                                <span className="text-sm font-medium text-muted-foreground">{registrations} / {capacity}</span>
+                            </div>
+                            <Progress value={progress} />
+                            <p className="text-xs text-muted-foreground mt-1">{format(event.date, "MMM d, p")}</p>
+                        </div>
+                    )
+                }) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No ongoing events right now.</p>
+                )}
+            </CardContent>
+            </Card>
+
+            <Card className="glass">
+                <CardHeader>
+                    <CardTitle className="font-headline">Upcoming Events</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {upcomingEvents.slice(0, 5).map((event, index) => (
+                        <div key={event.id}>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="font-semibold">{event.title}</p>
+                                    <p className="text-sm text-muted-foreground">{format(event.date, "eeee, MMM d")}</p>
+                                </div>
+                                <Link href={`/events/${event.id}`}>
+                                    <Button variant="ghost" size="sm">
+                                        View
+                                        <ArrowRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                </Link>
+                            </div>
+                            {index < upcomingEvents.slice(0, 5).length - 1 && <Separator className="my-2" />}
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
       </div>
     </div>
   );
 }
-
-    
