@@ -1,7 +1,8 @@
+
 "use client";
 
 import Image from 'next/image';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, usePathname } from 'next/navigation';
 import { mockEvents, mockUsers, addMockTicket, getMockTickets } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const { user } = useContext(UserContext);
   const { toast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
   
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -62,6 +64,8 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   const handleRegisterClick = () => {
     if (!user) {
+      // Store the current path to redirect back after login
+      sessionStorage.setItem('redirectAfterLogin', pathname);
       router.push('/login');
     }
   };
@@ -69,11 +73,16 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const processRegistration = () => {
     if (!user) return; // Should not happen if logic is correct
     
+    if (!isFree) {
+        router.push(`/payment?eventId=${event.id}`);
+        return;
+    }
+
     const newTicket: TicketType = {
         id: `ticket-${Date.now()}`,
         eventId: event.id,
         userId: user.id,
-        price: event.tickets[0].price,
+        price: 0, // Free event
         status: 'confirmed',
         qrCode: `mock-qr-code-${Date.now()}`
     };
@@ -222,13 +231,13 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                   <AlertDialogDescription>
                     {isFree
                       ? `You are about to register for "${event.title}". This is a free event. Continue?`
-                      : `You are about to purchase a ticket for "${event.title}" for ₹${event.tickets[0].price.toFixed(2)}. This is a simulated payment.`}
+                      : `You are about to proceed to payment for "${event.title}" for a ticket price of ₹${event.tickets[0].price.toFixed(2)}.`}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={processRegistration}>
-                    {isFree ? 'Confirm Registration' : 'Confirm Payment'}
+                    {isFree ? 'Confirm Registration' : 'Proceed to Payment'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -243,3 +252,5 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
+    

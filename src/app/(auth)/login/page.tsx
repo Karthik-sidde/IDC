@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useContext } from "react";
@@ -33,7 +34,9 @@ export default function LoginPage() {
     setTimeout(() => {
       login(email, "user");
       setIsLoading(false);
-      router.push("/events");
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
+      sessionStorage.removeItem('redirectAfterLogin');
+      router.push(redirectPath);
     }, 1000);
   };
   
@@ -47,7 +50,9 @@ export default function LoginPage() {
       login(email, "user");
       setIsLoading(false);
       setIsRegistering(false);
-      router.push("/events");
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
+      sessionStorage.removeItem('redirectAfterLogin');
+      router.push(redirectPath);
     }, 1000);
   };
 
@@ -176,3 +181,5 @@ export default function LoginPage() {
     </Card>
   );
 }
+
+    
