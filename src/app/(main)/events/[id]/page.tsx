@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { mockEvents, mockUsers, addMockTicket, getMockTickets } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +39,7 @@ import { type Ticket as TicketType } from '@/lib/types';
 export default function EventDetailPage({ params }: { params: { id: string } }) {
   const { user } = useContext(UserContext);
   const { toast } = useToast();
+  const router = useRouter();
   
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -61,11 +62,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   const handleRegister = () => {
     if (!user) {
-         toast({
-            title: "Please log in",
-            description: "You need to be logged in to register for an event.",
-            variant: "destructive",
-        });
+        router.push('/login');
         return;
     }
     
@@ -197,8 +194,8 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered}>
-                {isRegistered ? (
+              <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered && !!user}>
+                {isRegistered && !!user ? (
                   <>
                     <CheckCircle2 className="mr-2 h-5 w-5" />
                     Registered

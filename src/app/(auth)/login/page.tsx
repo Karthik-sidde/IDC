@@ -14,22 +14,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { UserContext } from "@/context/UserContext";
-import { type UserRole } from "@/lib/types";
 import { AppLogo } from "@/components/AppLogo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("alex.doe@example.com");
-  const [role, setRole] = useState<UserRole>("user");
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const router = useRouter();
@@ -40,9 +31,9 @@ export default function LoginPage() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      login(email, role);
+      login(email, "user");
       setIsLoading(false);
-      router.push("/");
+      router.push("/events");
     }, 1000);
   };
   
@@ -56,7 +47,7 @@ export default function LoginPage() {
       login(email, "user");
       setIsLoading(false);
       setIsRegistering(false);
-      router.push("/");
+      router.push("/events");
     }, 1000);
   };
 
@@ -77,7 +68,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
                <CardDescription className="text-center">
-                Select a role to sign in to your account
+                Sign in to your account to continue.
               </CardDescription>
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
@@ -107,22 +98,6 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select
-                  value={role}
-                  onValueChange={(value) => setRole(value as UserRole)}
-                >
-                  <SelectTrigger id="role" className="w-full">
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="user">User / Attendee</SelectItem>
-                    <SelectItem value="admin">Admin / Organizer</SelectItem>
-                    <SelectItem value="super_admin">Super Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button
@@ -133,6 +108,9 @@ export default function LoginPage() {
                 {isLoading && !isRegistering ? <Loader2 className="animate-spin" /> : <LogIn />}
                 <span>Sign In</span>
               </Button>
+              <p className="text-xs text-muted-foreground">
+                Are you an admin? <Link href="/admin/login" className="text-primary underline">Login here</Link>
+              </p>
             </CardFooter>
           </form>
         </TabsContent>

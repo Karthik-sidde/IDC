@@ -27,31 +27,26 @@ import {
   LogOut,
   ChevronRight,
   Shield,
+  LogIn
 } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { UserContext } from "@/context/UserContext";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, logout } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
-
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const menuItems = [
     {
-      role: ["user", "admin", "super_admin"],
+      role: ["user", "admin", "super_admin", "guest"],
       href: "/events",
       icon: Calendar,
       label: "Browse Events",
@@ -99,8 +94,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     },
   ];
 
+  const currentUserRole = user?.role || "guest";
+
   const userMenu = menuItems.filter(
-    (item) => !item.group && user && item.role.includes(user.role)
+    (item) => !item.group && item.role.includes(currentUserRole)
   );
   const adminMenu = menuItems.filter(
     (item) => item.group === "Admin" && user && item.role.includes(user.role)
@@ -108,10 +105,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const superAdminMenu = menuItems.filter(
     (item) => item.group === "Super Admin" && user && item.role.includes(user.role)
   );
-
-  if (loading || !user) {
-    return null; // Or a loading spinner
+  
+  const getPageTitle = () => {
+    if (pathname === '/') return 'Home';
+    const allMenus = [...userMenu, ...adminMenu, ...superAdminMenu];
+    const
+ 
+activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !== '/');
+    return activeItem?.label || "Events";
   }
+
 
   return (
     <SidebarProvider>
@@ -178,29 +181,36 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           )}
         </SidebarContent>
         <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-                <LogOut />
-                <span>Logout</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          {user && (
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                  <LogOut />
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          )}
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:pt-4">
+         <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:pt-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="md:hidden" />
-            <h1 className="text-xl font-semibold font-headline tracking-tight">
-                {
-                    (menuItems.find(item => pathname.startsWith(item.href) && item.href !== '/') || {label: 'Events'}).label
-                }
+             <h1 className="text-xl font-semibold font-headline tracking-tight">
+                {getPageTitle()}
             </h1>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <UserNav />
+            {user ? (
+              <UserNav />
+            ) : (
+               <Button variant="outline" onClick={() => router.push('/login')}>
+                <LogIn className="mr-2 h-4 w-4"/>
+                Sign In
+              </Button>
+            )}
           </div>
         </header>
         <main className="flex-1 p-4 sm:px-6 sm:pb-6">{children}</main>
