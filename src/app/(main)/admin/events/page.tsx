@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { format, isBefore, isSameDay, addDays } from "date-fns";
+import { format, isBefore, isSameDay, addDays, startOfDay } from "date-fns";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { getMockEvents } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { type Event } from "@/lib/types";
 import {
   AlertDialog,
@@ -44,6 +44,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+type EventStatus = "Ongoing" | "Upcoming" | "Past";
+
 export default function AdminEventsPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -54,6 +56,42 @@ export default function AdminEventsPage() {
   useEffect(() => {
     setEvents(getMockEvents());
   }, []);
+
+  const getEventStatus = (event: Event): EventStatus => {
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    const today = startOfDay(new Date());
+
+    if (isBefore(eventDate, today)) {
+        return "Past";
+    }
+    if (isBefore(eventDate, addDays(now, 2)) && !isBefore(eventDate, now)) {
+        return "Ongoing";
+    }
+    
+    if (isSameDay(eventDate, now)) return "Ongoing";
+    
+    return "Upcoming";
+  };
+  
+  const sortedEvents = useMemo(() => {
+    const statusOrder: Record<EventStatus, number> = {
+      "Ongoing": 1,
+      "Upcoming": 2,
+      "Past": 3,
+    };
+    return [...events].sort((a, b) => {
+        const statusA = getEventStatus(a);
+        const statusB = getEventStatus(b);
+        if (statusA !== statusB) {
+            return statusOrder[statusA] - statusOrder[statusB];
+        }
+        // For events with same status, sort by date (upcoming soonest, past most recent)
+        if(statusA === 'Upcoming') return a.date.getTime() - b.date.getTime();
+        return b.date.getTime() - a.date.getTime();
+    });
+  }, [events]);
+
 
   const handleDeleteClick = (event: Event) => {
     setEventToDelete(event);
@@ -105,18 +143,8 @@ export default function AdminEventsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {events.map((event) => {
-                const now = new Date();
-                const eventDate = new Date(event.date);
-                const isPast = isBefore(eventDate, now) && !isSameDay(eventDate, now);
-                const isOngoing = (isSameDay(eventDate, now) || isBefore(eventDate, addDays(now, 2))) && !isPast;
-                
-                const status = isPast
-                    ? "Past"
-                    : isOngoing
-                    ? "Ongoing"
-                    : "Upcoming";
-
+              {sortedEvents.map((event) => {
+                const status = getEventStatus(event);
 
                 return (
                   <TableRow key={event.id}>
@@ -135,7 +163,7 @@ export default function AdminEventsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {format(eventDate, "MMM d, yyyy, p")}
+                      {format(new Date(event.date), "MMM d, yyyy, p")}
                     </TableCell>
                     <TableCell>
                       {event.venue.type === "online"
