@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useContext, useEffect, useState } from "react";
@@ -174,7 +175,8 @@ const HomePageContent = () => {
 
 
 export default function Home() {
-  const { loading } = useContext(UserContext);
+  const { user, loading } = useContext(UserContext);
+  const router = useRouter();
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
