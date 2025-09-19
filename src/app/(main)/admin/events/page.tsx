@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { format, isBefore, isSameDay, addDays } from "date-fns";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { getMockEvents } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
@@ -108,13 +108,15 @@ export default function AdminEventsPage() {
               {events.map((event) => {
                 const now = new Date();
                 const eventDate = new Date(event.date);
-                const status =
-                  eventDate < now
+                const isPast = isBefore(eventDate, now) && !isSameDay(eventDate, now);
+                const isOngoing = (isSameDay(eventDate, now) || isBefore(eventDate, addDays(now, 2))) && !isPast;
+                
+                const status = isPast
                     ? "Past"
-                    : eventDate > now &&
-                      eventDate < new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000)
+                    : isOngoing
                     ? "Ongoing"
                     : "Upcoming";
+
 
                 return (
                   <TableRow key={event.id}>
