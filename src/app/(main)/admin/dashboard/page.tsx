@@ -25,7 +25,7 @@ import {
   Line,
   LineChart,
 } from "recharts";
-import { ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 
 const revenueData = [
   { month: 'Jan', revenue: 12000 },
@@ -42,6 +42,24 @@ const registrationsData = [
     { name: 'Art Show', registrations: 150, capacity: 200 },
     { name: 'Pitch Night', registrations: 800, capacity: 1000 },
 ]
+
+const revenueChartConfig = {
+  revenue: {
+    label: "Revenue",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig
+
+const registrationsChartConfig = {
+    registrations: {
+        label: "Registrations",
+        color: "hsl(var(--primary))",
+    },
+    capacity: {
+        label: "Capacity",
+        color: "hsl(var(--secondary))",
+    }
+} satisfies ChartConfig
 
 export default function AdminDashboardPage() {
   return (
@@ -95,16 +113,16 @@ export default function AdminDashboardPage() {
             <CardDescription>Monthly revenue over the last 6 months.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+             <ChartContainer config={revenueChartConfig} className="h-[300px] w-full">
               <LineChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} />
                 <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `₹${Number(value) / 1000}k`} />
                 <Tooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
                 <Legend />
-                <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} dot={{r:4, fill: 'hsl(var(--primary))'}} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} dot={{r:4, fill: 'var(--color-revenue)'}} activeDot={{ r: 6 }} />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
         <Card>
@@ -113,17 +131,17 @@ export default function AdminDashboardPage() {
              <CardDescription>Current registration numbers for upcoming events.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ChartContainer config={registrationsChartConfig} className="h-[300px] w-full">
                 <BarChart data={registrationsData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false}/>
                     <XAxis dataKey="name" tickLine={false} axisLine={false} tickFormatter={(value) => value.substring(0, 8) + '...'}/>
                     <YAxis tickLine={false} axisLine={false}/>
                     <Tooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
                     <Legend />
-                    <Bar dataKey="registrations" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="capacity" fill="hsl(var(--secondary))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="registrations" fill="var(--color-registrations)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="capacity" fill="var(--color-capacity)" radius={[4, 4, 0, 0]} />
                 </BarChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
