@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -152,6 +151,7 @@ export default function AdminEventsPage() {
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
                             onSelect={() => router.push("/admin/events/new")}
+                            disabled={status === 'Past'}
                           >
                             Edit
                           </DropdownMenuItem>
