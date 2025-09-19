@@ -17,27 +17,12 @@ import { EventCard } from "@/components/events/EventCard";
 
 
 const LoadingScreen = () => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 25);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <AppLogo />
       </motion.div>
@@ -45,18 +30,10 @@ const LoadingScreen = () => {
         className="text-lg font-semibold text-primary"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.1, ease: "easeInOut" }}
+        transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
         Indian Data Club
       </motion.p>
-      <motion.div
-        className="w-1/4 mt-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.2, ease: "easeInOut" }}
-      >
-        <Progress value={progress} className="w-full" />
-      </motion.div>
     </div>
   );
 };
@@ -289,7 +266,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
-    }, 1800); 
+    }, 1200); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -300,5 +277,3 @@ export default function Home() {
 
   return <HomePageContent />;
 }
-
-    
