@@ -35,6 +35,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/context/UserContext';
 import { type Ticket as TicketType } from '@/lib/types';
+import { LoginDialog } from '@/components/auth/LoginDialog';
 
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
@@ -44,6 +45,9 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const pathname = usePathname();
   
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
+
 
   const event = mockEvents.find((e) => e.id === params.id);
 
@@ -64,9 +68,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   const handleRegisterClick = () => {
     if (!user) {
-      // Store the current path to redirect back after login
-      sessionStorage.setItem('redirectAfterLogin', pathname);
-      router.push('/login');
+        setIsLoginDialogOpen(true);
     }
   };
 
@@ -97,6 +99,16 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
       className: "bg-green-500 text-white",
     });
   };
+
+  const onLoginSuccess = () => {
+    setJustLoggedIn(true);
+    // The user is now logged in, they can click "Register Now" again.
+    // The button will now trigger the AlertDialog.
+    toast({
+        title: "Logged In!",
+        description: "You can now register for the event.",
+    });
+  }
 
   const RegisterButton = () => (
      <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered && !!user}>
@@ -249,8 +261,11 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
           )}
         </div>
       </div>
+       <LoginDialog 
+        open={isLoginDialogOpen} 
+        onOpenChange={setIsLoginDialogOpen}
+        onLoginSuccess={onLoginSuccess}
+      />
     </div>
   );
 }
-
-    
