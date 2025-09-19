@@ -34,12 +34,12 @@ const LoadingScreen = () => {
       >
         Indian Data Club
       </motion.p>
-      <div className="w-1/3 max-w-xs overflow-hidden rounded-full mt-2">
+       <div className="w-1/3 max-w-xs overflow-hidden rounded-full mt-2 h-2 bg-muted">
          <motion.div
-          className="h-2 w-full bg-primary"
-          initial={{ x: "-100%" }}
-          animate={{ x: "0%" }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          className="h-full w-full bg-primary origin-left"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
         />
       </div>
     </div>
@@ -57,8 +57,8 @@ const HomePageContent = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
+        staggerChildren: 0.05,
+        delayChildren: 0.05,
       },
     },
   };
@@ -69,7 +69,7 @@ const HomePageContent = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.4,
+        duration: 0.3,
         ease: "easeOut",
       },
     },
