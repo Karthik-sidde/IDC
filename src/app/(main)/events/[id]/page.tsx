@@ -69,17 +69,18 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const handleRegisterClick = () => {
     if (!user) {
         setIsLoginDialogOpen(true);
+    } else {
+        // If user is logged in and event is not free, go to payment
+        if (!isFree) {
+            router.push(`/payment?eventId=${event.id}`);
+        }
+        // If it's free, the AlertDialog will be triggered by the button
     }
   };
 
-  const processRegistration = () => {
-    if (!user) return; // Should not happen if logic is correct
+  const processFreeRegistration = () => {
+    if (!user) return; // Should not happen
     
-    if (!isFree) {
-        router.push(`/payment?eventId=${event.id}`);
-        return;
-    }
-
     const newTicket: TicketType = {
         id: `ticket-${Date.now()}`,
         eventId: event.id,
@@ -102,8 +103,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   const onLoginSuccess = () => {
     setJustLoggedIn(true);
-    // The user is now logged in, they can click "Register Now" again.
-    // The button will now trigger the AlertDialog.
     toast({
         title: "Logged In!",
         description: "You can now register for the event.",
@@ -233,27 +232,31 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
           )}
 
           {user ? (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
+            isFree ? (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <RegisterButton />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You are about to register for "{event.title}". This is a free event. Continue?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={processFreeRegistration}>
+                      Confirm Registration
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+               <div onClick={handleRegisterClick}>
                 <RegisterButton />
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {isFree
-                      ? `You are about to register for "${event.title}". This is a free event. Continue?`
-                      : `You are about to proceed to payment for "${event.title}" for a ticket price of ₹${event.tickets[0].price.toFixed(2)}.`}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={processRegistration}>
-                    {isFree ? 'Confirm Registration' : 'Proceed to Payment'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+               </div>
+            )
           ) : (
              <div onClick={handleRegisterClick}>
                 <RegisterButton />
