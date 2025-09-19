@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -25,19 +25,32 @@ import { useToast } from "@/hooks/use-toast";
 import { addMockEvent } from "@/lib/mock-data";
 import { type Event } from "@/lib/types";
 import { format } from "date-fns";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function NewEventPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("My Awesome Event");
+  const [description, setDescription] = useState("This is a description of my awesome event.");
+  const [category, setCategory] = useState("tech");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
-  const [venueDetails, setVenueDetails] = useState("");
+  const [venueDetails, setVenueDetails] = useState("Some place cool");
   const [ticketTier, setTicketTier] = useState("General Admission");
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketQuantity, setTicketQuantity] = useState(100);
+  const [eventType, setEventType] = useState<"free" | "paid">("paid");
+
+  useEffect(() => {
+    if (eventType === "free") {
+      setTicketPrice(0);
+    } else {
+      // Optionally reset to a default price or leave as is
+      if (ticketPrice === 0) {
+        setTicketPrice(10); // Default price for paid events
+      }
+    }
+  }, [eventType]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +68,7 @@ export default function NewEventPage() {
       tickets: [
         {
           tier: ticketTier,
-          price: Number(ticketPrice),
+          price: eventType === 'free' ? 0 : Number(ticketPrice),
           quantity: Number(ticketQuantity),
         },
       ],
@@ -180,6 +193,25 @@ export default function NewEventPage() {
               />
             </div>
           </div>
+          
+           <div className="space-y-2">
+              <Label>Event Type</Label>
+              <RadioGroup
+                defaultValue={eventType}
+                onValueChange={(value) => setEventType(value as 'free' | 'paid')}
+                className="flex items-center gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="paid" id="r-paid" />
+                  <Label htmlFor="r-paid">Paid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="free" id="r-free" />
+                  <Label htmlFor="r-free">Free</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="ticket-tier">Ticket Tier</Label>
@@ -199,6 +231,7 @@ export default function NewEventPage() {
                 placeholder="e.g., 25"
                 value={ticketPrice}
                 onChange={(e) => setTicketPrice(Number(e.target.value))}
+                disabled={eventType === "free"}
                 required
               />
             </div>
