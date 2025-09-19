@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserContext } from "@/context/UserContext";
 import { ArrowRight, BookOpen, Users, Briefcase, BrainCircuit } from "lucide-react";
 import { AppLogo } from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Progress } from "@/components/ui/progress";
 import { mockEvents } from "@/lib/mock-data";
 import { EventCard } from "@/components/events/EventCard";
 
@@ -22,7 +20,7 @@ const LoadingScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
       >
         <AppLogo />
       </motion.div>
@@ -30,22 +28,21 @@ const LoadingScreen = () => {
         className="text-lg font-semibold text-primary"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
       >
         Indian Data Club
       </motion.p>
-       <div className="w-1/3 max-w-xs overflow-hidden rounded-full mt-2 h-2 bg-muted">
-         <motion.div
-          className="h-full w-full bg-primary origin-left"
+      <div className="w-1/3 max-w-xs overflow-hidden rounded-full mt-2 h-2 bg-muted">
+        <motion.div
+          className="h-full origin-left bg-primary"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "circOut", delay: 0.5 }}
         />
       </div>
     </div>
   );
 };
-
 
 const HomePageContent = () => {
   const router = useRouter();
@@ -57,8 +54,8 @@ const HomePageContent = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
-        delayChildren: 0.05,
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
       },
     },
   };
@@ -69,7 +66,7 @@ const HomePageContent = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.4,
         ease: "easeOut",
       },
     },
@@ -261,7 +258,10 @@ const HomePageContent = () => {
         {/* Contact Section */}
         <footer className="py-8 px-4 text-center bg-background">
             <p className="text-muted-foreground">Have questions? Reach out to us at <a href="mailto:hello@indiandataclub.com" className="text-primary hover:underline">hello@indiandataclub.com</a></p>
-            <p className="text-xs text-muted-foreground mt-2">&copy; {new Date().getFullYear()} Indian Data Club. All Rights Reserved.</p>
+             <div className="text-center text-sm text-muted-foreground mt-4">
+              <Link href="/admin/login" className="hover:text-primary transition-colors">Admin Portal</Link>
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">&copy; {new Date().getFullYear()} Indian Data Club. All Rights Reserved.</p>
         </footer>
       </div>
   );
@@ -274,7 +274,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
-    }, 1200); 
+    }, 1500); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -285,5 +285,3 @@ export default function Home() {
 
   return <HomePageContent />;
 }
-
-    

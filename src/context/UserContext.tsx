@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from "react";
@@ -8,7 +9,6 @@ interface UserContextType {
   loading: boolean;
   login: (email: string, role: UserRole) => void;
   logout: () => void;
-  switchRole: (role: UserRole) => void;
   setUser: (user: User) => void;
 }
 
@@ -17,7 +17,6 @@ export const UserContext = createContext<UserContextType>({
   loading: true,
   login: () => {},
   logout: () => {},
-  switchRole: () => {},
   setUser: () => {},
 });
 
@@ -43,11 +42,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     // Find a user that matches the email or just the role for mock purposes
     let foundUser = mockUsers.find(
-      (u) => u.email === email && u.role === role
+      (u) => u.email === email
     );
+    // If we're logging in from admin page, ensure it's an admin/super_admin
+    if (role.includes('admin') && foundUser && !foundUser.role.includes('admin')) {
+      foundUser = undefined;
+    }
+
     if (!foundUser) {
         foundUser = mockUsers.find((u) => u.role === role);
     }
+
 
     if (foundUser) {
       sessionStorage.setItem("currentUser", JSON.stringify(foundUser));
@@ -61,21 +66,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserState(null);
   };
 
-  const switchRole = (role: UserRole) => {
-    const newUser = mockUsers.find((u) => u.role === role);
-    if (newUser) {
-      sessionStorage.setItem("currentUser", JSON.stringify(newUser));
-      setUserState(newUser);
-    }
-  };
-  
   const setUser = (user: User) => {
     sessionStorage.setItem("currentUser", JSON.stringify(user));
     setUserState(user);
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, switchRole, setUser }}>
+    <UserContext.Provider value={{ user, loading, login, logout, setUser }}>
       {children}
     </UserContext.Provider>
   );

@@ -7,7 +7,6 @@ import {
   User as UserIcon,
   Shield,
   UserCog,
-  Replace,
   Settings,
 } from "lucide-react";
 
@@ -24,11 +23,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import { UserRole } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export function UserNav() {
-  const { user, logout, switchRole } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -51,12 +49,6 @@ export function UserNav() {
       description: "You have been successfully logged out.",
     });
     router.push("/");
-  };
-
-  const handleRoleSwitch = (role: UserRole) => {
-    switchRole(role);
-    // You might want to force a reload or redirect to the new default page
-    window.location.href = "/";
   };
   
   const RoleIcon =
@@ -89,22 +81,6 @@ export function UserNav() {
            <DropdownMenuItem onSelect={() => router.push('/profile')}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Profile Settings</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="font-normal text-xs">Switch Role</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={() => handleRoleSwitch("user")} disabled={user.role === 'user'}>
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>User</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => handleRoleSwitch("admin")} disabled={user.role === 'admin'}>
-            <UserCog className="mr-2 h-4 w-4" />
-            <span>Admin</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => handleRoleSwitch("super_admin")} disabled={user.role === 'super_admin'}>
-            <Shield className="mr-2 h-4 w-4" />
-            <span>Super Admin</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
