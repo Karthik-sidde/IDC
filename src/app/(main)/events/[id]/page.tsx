@@ -104,7 +104,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 <div key={ticket.tier} className="flex justify-between items-center">
                   <span className="font-medium">{ticket.tier}</span>
                   <Badge variant="secondary" className="text-base">
-                    {ticket.price === 0 ? 'Free' : `$${ticket.price.toFixed(2)}`}
+                    {ticket.price === 0 ? 'Free' : `₹${ticket.price.toFixed(2)}`}
                   </Badge>
                 </div>
               ))}

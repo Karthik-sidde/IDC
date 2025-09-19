@@ -103,7 +103,7 @@ export default function NewEventPage() {
                     <Input id="ticket-tier" placeholder="e.g., General Admission" defaultValue="General Admission"/>
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="ticket-price">Price ($)</Label>
+                    <Label htmlFor="ticket-price">Price (₹)</Label>
                     <Input id="ticket-price" type="number" placeholder="e.g., 25" />
                 </div>
                 <div className="space-y-2">

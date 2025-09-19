@@ -41,7 +41,7 @@ export function EventCard({ event }: EventCardProps) {
               variant={isFree ? "secondary" : "destructive"}
               className="absolute right-2 top-2"
             >
-              {isFree ? "Free" : `$${event.tickets[0].price}`}
+              {isFree ? "Free" : `₹${event.tickets[0].price}`}
             </Badge>
           </div>
         </CardHeader>
