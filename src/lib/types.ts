@@ -9,6 +9,8 @@ export interface User {
   profile: {
     avatar: string;
     bio: string;
+    xUrl?: string;
+    linkedinUrl?: string;
   };
 }
 

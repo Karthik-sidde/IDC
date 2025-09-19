@@ -11,6 +11,8 @@ export const mockUsers: User[] = [
     profile: {
       avatar: "https://picsum.photos/seed/avatar1/100/100",
       bio: "Tech enthusiast and event lover.",
+      xUrl: "https://x.com/alexdoe",
+      linkedinUrl: "https://linkedin.com/in/alexdoe"
     },
   },
   {

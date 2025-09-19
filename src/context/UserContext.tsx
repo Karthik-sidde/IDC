@@ -9,6 +9,7 @@ interface UserContextType {
   login: (email: string, role: UserRole) => void;
   logout: () => void;
   switchRole: (role: UserRole) => void;
+  setUser: (user: User) => void;
 }
 
 export const UserContext = createContext<UserContextType>({
@@ -17,17 +18,18 @@ export const UserContext = createContext<UserContextType>({
   login: () => {},
   logout: () => {},
   switchRole: () => {},
+  setUser: () => {},
 });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
       const storedUser = sessionStorage.getItem("currentUser");
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        setUserState(JSON.parse(storedUser));
       }
     } catch (error) {
       console.error("Failed to parse user from sessionStorage", error);
@@ -49,26 +51,31 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     if (foundUser) {
       sessionStorage.setItem("currentUser", JSON.stringify(foundUser));
-      setUser(foundUser);
+      setUserState(foundUser);
     }
     setLoading(false);
   };
 
   const logout = () => {
     sessionStorage.removeItem("currentUser");
-    setUser(null);
+    setUserState(null);
   };
 
   const switchRole = (role: UserRole) => {
     const newUser = mockUsers.find((u) => u.role === role);
     if (newUser) {
       sessionStorage.setItem("currentUser", JSON.stringify(newUser));
-      setUser(newUser);
+      setUserState(newUser);
     }
   };
+  
+  const setUser = (user: User) => {
+    sessionStorage.setItem("currentUser", JSON.stringify(user));
+    setUserState(user);
+  }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, switchRole }}>
+    <UserContext.Provider value={{ user, loading, login, logout, switchRole, setUser }}>
       {children}
     </UserContext.Provider>
   );

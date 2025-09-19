@@ -7,6 +7,7 @@ import {
   Shield,
   UserCog,
   Replace,
+  Settings,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -76,6 +77,13 @@ export function UserNav() {
             </div>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+           <DropdownMenuItem onSelect={() => router.push('/profile')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Profile Settings</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel className="font-normal text-xs">Switch Role</DropdownMenuLabel>
