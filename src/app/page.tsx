@@ -174,8 +174,7 @@ const HomePageContent = () => {
 
 
 export default function Home() {
-  const { user, loading } = useContext(UserContext);
-  const router = useRouter();
+  const { loading } = useContext(UserContext);
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
@@ -185,16 +184,6 @@ export default function Home() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (!initialLoading && !loading && user) {
-       if (user.role === "user") {
-        router.push("/events");
-      } else {
-        router.push("/admin/dashboard");
-      }
-    }
-  }, [user, loading, initialLoading, router]);
 
   if (initialLoading || loading) {
     return <LoadingScreen />;
