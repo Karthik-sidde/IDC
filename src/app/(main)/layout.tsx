@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -33,6 +34,7 @@ import { useContext } from "react";
 import { UserContext } from "@/context/UserContext";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useContext(UserContext);
@@ -213,7 +215,19 @@ activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !
             )}
           </div>
         </header>
-        <main className="flex-1 p-4 sm:px-6 sm:pb-6">{children}</main>
+        <main className="flex-1 p-4 sm:px-6 sm:pb-6">
+           <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
