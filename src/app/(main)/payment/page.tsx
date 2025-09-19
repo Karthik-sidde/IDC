@@ -141,22 +141,22 @@ function PaymentPageContent() {
                         <Label htmlFor="card-number">Card Number</Label>
                         <div className="relative">
                             <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input id="card-number" placeholder="**** **** **** 1234" className="pl-10" required />
+                            <Input id="card-number" placeholder="**** **** **** 1234" className="pl-10" />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label htmlFor="expiry">Expiry</Label>
-                            <Input id="expiry" placeholder="MM/YY" required />
+                            <Input id="expiry" placeholder="MM/YY" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="cvc">CVC</Label>
-                            <Input id="cvc" placeholder="123" required />
+                            <Input id="cvc" placeholder="123" />
                         </div>
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="name-on-card">Name on Card</Label>
-                        <Input id="name-on-card" defaultValue={user?.name} required />
+                        <Input id="name-on-card" defaultValue={user?.name} />
                     </div>
                 </CardContent>
                 <CardFooter>
@@ -179,5 +179,3 @@ export default function PaymentPage() {
         </Suspense>
     )
 }
-
-    
