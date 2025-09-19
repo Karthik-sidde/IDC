@@ -5,7 +5,7 @@ import { UserProvider } from '@/context/UserContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Eventide Platform',
+  title: 'IDC Platform',
   description: 'A Futuristic Event Management Platform Prototype',
 };
 

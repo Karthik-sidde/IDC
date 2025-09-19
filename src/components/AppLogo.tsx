@@ -7,7 +7,7 @@ export function AppLogo() {
         <PartyPopper className="size-5" />
       </div>
       <span className="text-lg font-bold font-headline tracking-tighter text-primary group-data-[collapsible=icon]:hidden">
-        Eventide
+        IDC
       </span>
     </div>
   );
