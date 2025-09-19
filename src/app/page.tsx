@@ -4,7 +4,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/UserContext";
-import { Loader2, ArrowRight, BookOpen, Users, BrainCircuit, Briefcase } from "lucide-react";
+import { ArrowRight, BookOpen, Users, Briefcase, BrainCircuit } from "lucide-react";
 import { AppLogo } from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -26,9 +26,9 @@ const LoadingScreen = () => {
           clearInterval(timer);
           return 100;
         }
-        return prev + 1;
+        return prev + 2;
       });
-    }, 30); // Adjust timing for desired speed
+    }, 25);
     return () => clearInterval(timer);
   }, []);
 
@@ -37,7 +37,7 @@ const LoadingScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
       >
         <AppLogo />
       </motion.div>
@@ -45,7 +45,7 @@ const LoadingScreen = () => {
         className="text-lg font-semibold text-primary"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.4, delay: 0.1, ease: "easeInOut" }}
       >
         Indian Data Club
       </motion.p>
@@ -53,7 +53,7 @@ const LoadingScreen = () => {
         className="w-1/4 mt-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.4, delay: 0.2, ease: "easeInOut" }}
       >
         <Progress value={progress} className="w-full" />
       </motion.div>
@@ -72,7 +72,7 @@ const HomePageContent = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.1,
         delayChildren: 0.1,
       },
     },
@@ -84,7 +84,7 @@ const HomePageContent = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.4,
         ease: "easeOut",
       },
     },
@@ -104,9 +104,9 @@ const HomePageContent = () => {
             <div className="absolute inset-0 bg-black/60" />
             <motion.div
                 className="relative z-10"
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
             >
                 <h1 className="text-4xl md:text-6xl font-headline font-bold tracking-tight">
                     Welcome to the Indian Data Club
@@ -197,7 +197,7 @@ const HomePageContent = () => {
                         Check out some of our upcoming workshops and conferences.
                     </motion.p>
                     <motion.div variants={containerVariants} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {featuredEvents.map((event, i) => (
+                        {featuredEvents.map((event) => (
                            <motion.div key={event.id} variants={itemVariants}>
                                 <EventCard event={event} />
                            </motion.div>
@@ -284,18 +284,17 @@ const HomePageContent = () => {
 
 
 export default function Home() {
-  const { loading } = useContext(UserContext);
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
-    }, 3500); 
+    }, 1800); 
 
     return () => clearTimeout(timer);
   }, []);
 
-  if (initialLoading || loading) {
+  if (initialLoading) {
     return <LoadingScreen />;
   }
 
