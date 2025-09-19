@@ -1,4 +1,6 @@
-import { mockTickets, mockEvents } from '@/lib/mock-data';
+"use client";
+
+import { getMockTickets, mockEvents } from '@/lib/mock-data';
 import {
   Card,
   CardContent,
@@ -13,19 +15,31 @@ import { Ticket, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useContext, useMemo } from 'react';
+import { UserContext } from '@/context/UserContext';
+import { type Event } from '@/lib/types';
+
 
 export default function MyEventsPage() {
-  // Assuming a logged-in user with id 'user-1'
-  const userId = 'user-1';
-  const userTickets = mockTickets.filter((t) => t.userId === userId);
-  const upcomingEvents = userTickets
-    .map((ticket) => mockEvents.find((e) => e.id === ticket.eventId))
-    .filter((event) => event && event.date >= new Date());
-  const pastEvents = userTickets
-    .map((ticket) => mockEvents.find((e) => e.id === ticket.eventId))
-    .filter((event) => event && event.date < new Date());
+  const { user } = useContext(UserContext);
 
-  const EventTicketCard = ({ event }: { event: any }) => (
+  const { upcomingEvents, pastEvents } = useMemo(() => {
+    if (!user) return { upcomingEvents: [], pastEvents: [] };
+
+    const userTickets = getMockTickets().filter((t) => t.userId === user.id);
+    
+    const events = userTickets.map((ticket) => 
+        mockEvents.find((e) => e.id === ticket.eventId)
+    ).filter((event): event is Event => event !== undefined);
+
+    const upcoming = events.filter((event) => event.date >= new Date());
+    const past = events.filter((event) => event.date < new Date());
+    
+    return { upcomingEvents: upcoming, pastEvents: past };
+  }, [user]);
+
+
+  const EventTicketCard = ({ event }: { event: Event }) => (
     <Card className="overflow-hidden transition-shadow hover:shadow-lg glass">
       <div className="flex flex-col sm:flex-row">
         <div className="relative h-40 w-full sm:w-48 flex-shrink-0">
@@ -66,6 +80,14 @@ export default function MyEventsPage() {
     </Card>
   );
 
+  if (!user) {
+    return (
+        <div className="text-center text-muted-foreground py-8">
+            Please log in to see your events.
+        </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="upcoming" className="w-full">
@@ -99,5 +121,3 @@ export default function MyEventsPage() {
     </div>
   );
 }
-
-    

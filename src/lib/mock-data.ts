@@ -127,7 +127,7 @@ export const mockEvents: Event[] = [
   },
 ];
 
-export const mockTickets: Ticket[] = [
+let mockTickets: Ticket[] = [
   {
     id: "ticket-1",
     eventId: "event-5",
@@ -145,3 +145,11 @@ export const mockTickets: Ticket[] = [
     qrCode: "mock-qr-code-2",
   },
 ];
+
+// Function to get tickets
+export const getMockTickets = () => mockTickets;
+
+// Function to add a ticket
+export const addMockTicket = (ticket: Ticket) => {
+  mockTickets.push(ticket);
+};

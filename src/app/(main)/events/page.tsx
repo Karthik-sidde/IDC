@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { EventCard } from "@/components/events/EventCard";
-import { mockEvents, mockUsers, mockTickets } from "@/lib/mock-data";
+import { mockEvents, mockUsers, getMockTickets } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,6 +31,7 @@ export default function EventsPage() {
         return;
     }
 
+    const mockTickets = getMockTickets();
     const userPastEventIds = mockTickets.filter(t => t.userId === user.id).map(t => t.eventId);
     const userPastEvents = mockEvents.filter(e => userPastEventIds.includes(e.id));
     

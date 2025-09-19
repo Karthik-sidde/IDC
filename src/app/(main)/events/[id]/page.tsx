@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { mockEvents, mockUsers } from '@/lib/mock-data';
+import { mockEvents, mockUsers, addMockTicket, getMockTickets } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -30,14 +30,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { UserContext } from '@/context/UserContext';
+import { type Ticket as TicketType } from '@/lib/types';
+
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
-  const [isRegistered, setIsRegistered] = useState(false);
+  const { user } = useContext(UserContext);
   const { toast } = useToast();
+  
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const event = mockEvents.find((e) => e.id === params.id);
+
+  useEffect(() => {
+    if (user && event) {
+      const userTickets = getMockTickets();
+      const hasTicket = userTickets.some(ticket => ticket.userId === user.id && ticket.eventId === event.id);
+      setIsRegistered(hasTicket);
+    }
+  }, [user, event]);
+
+
   if (!event) {
     notFound();
   }
@@ -45,8 +60,27 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const isFree = event.tickets.some(ticket => ticket.price === 0);
 
   const handleRegister = () => {
-    // Simulate registration
+    if (!user) {
+         toast({
+            title: "Please log in",
+            description: "You need to be logged in to register for an event.",
+            variant: "destructive",
+        });
+        return;
+    }
+    
+    const newTicket: TicketType = {
+        id: `ticket-${Date.now()}`,
+        eventId: event.id,
+        userId: user.id,
+        price: event.tickets[0].price,
+        status: 'confirmed',
+        qrCode: `mock-qr-code-${Date.now()}`
+    };
+
+    addMockTicket(newTicket);
     setIsRegistered(true);
+
     toast({
       title: "Registration Successful!",
       description: `You're all set for ${event.title}.`,
@@ -199,5 +233,3 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
-
-    
