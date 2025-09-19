@@ -60,11 +60,14 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const organizer = mockUsers.find((u) => u.id === event.organizerId);
   const isFree = event.tickets.some(ticket => ticket.price === 0);
 
-  const handleRegister = () => {
+  const handleRegisterClick = () => {
     if (!user) {
-        router.push('/login');
-        return;
+      router.push('/login');
     }
+  };
+
+  const processRegistration = () => {
+    if (!user) return; // Should not happen if logic is correct
     
     const newTicket: TicketType = {
         id: `ticket-${Date.now()}`,
@@ -85,6 +88,22 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
       className: "bg-green-500 text-white",
     });
   };
+
+  const RegisterButton = () => (
+     <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered && !!user}>
+        {isRegistered && !!user ? (
+          <>
+            <CheckCircle2 className="mr-2 h-5 w-5" />
+            Registered
+          </>
+        ) : (
+          <>
+            <Ticket className="mr-2 h-5 w-5" />
+            Register Now
+          </>
+        )}
+      </Button>
+  );
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -192,39 +211,33 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             </Card>
           )}
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered && !!user}>
-                {isRegistered && !!user ? (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Registered
-                  </>
-                ) : (
-                  <>
-                    <Ticket className="mr-2 h-5 w-5" />
-                    Register Now
-                  </>
-                )}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {isFree
-                    ? `You are about to register for "${event.title}". This is a free event. Continue?`
-                    : `You are about to purchase a ticket for "${event.title}" for ₹${event.tickets[0].price.toFixed(2)}. This is a simulated payment.`}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleRegister}>
-                  {isFree ? 'Confirm Registration' : 'Confirm Payment'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {user ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <RegisterButton />
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {isFree
+                      ? `You are about to register for "${event.title}". This is a free event. Continue?`
+                      : `You are about to purchase a ticket for "${event.title}" for ₹${event.tickets[0].price.toFixed(2)}. This is a simulated payment.`}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={processRegistration}>
+                    {isFree ? 'Confirm Registration' : 'Confirm Payment'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+             <div onClick={handleRegisterClick}>
+                <RegisterButton />
+             </div>
+          )}
         </div>
       </div>
     </div>
