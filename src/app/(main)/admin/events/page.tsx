@@ -1,4 +1,8 @@
+
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { mockEvents } from "@/lib/mock-data";
@@ -26,96 +30,171 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useState } from "react";
+import { type Event } from "@/lib/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminEventsPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
+  const handleDeleteClick = (event: Event) => {
+    setEventToDelete(event);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (eventToDelete) {
+      setEvents(events.filter((event) => event.id !== eventToDelete.id));
+      toast({
+        title: "Event Deleted",
+        description: `"${eventToDelete.title}" has been removed.`,
+      });
+    }
+    setIsDeleteDialogOpen(false);
+    setEventToDelete(null);
+  };
+
   return (
-    <Card className="glass">
-      <CardHeader>
-        <div className="flex justify-between items-start">
+    <>
+      <Card className="glass">
+        <CardHeader>
+          <div className="flex justify-between items-start">
             <div>
-                <CardTitle className="font-headline">Manage Events</CardTitle>
-                <CardDescription>
+              <CardTitle className="font-headline">Manage Events</CardTitle>
+              <CardDescription>
                 Here you can create, edit, and manage all events.
-                </CardDescription>
+              </CardDescription>
             </div>
             <Link href="/admin/events/new">
-                <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Create Event
-                </Button>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Event
+              </Button>
             </Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Event</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Venue</TableHead>
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockEvents.map((event) => {
-              const now = new Date();
-              const eventDate = event.date;
-              const status =
-                eventDate < now
-                  ? "Past"
-                  : eventDate > now && eventDate < new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-                  ? "Ongoing"
-                  : "Upcoming";
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Event</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Venue</TableHead>
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {events.map((event) => {
+                const now = new Date();
+                const eventDate = new Date(event.date);
+                const status =
+                  eventDate < now
+                    ? "Past"
+                    : eventDate > now &&
+                      eventDate < new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    ? "Ongoing"
+                    : "Upcoming";
 
-              return (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.title}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        status === "Past"
-                          ? "outline"
-                          : status === "Ongoing"
-                          ? "destructive"
-                          : "secondary"
-                      }
-                    >
-                      {status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {format(event.date, "MMM d, yyyy, p")}
-                  </TableCell>
-                  <TableCell>
-                    {event.venue.type === 'online' ? 'Online' : event.venue.details}
+                return (
+                  <TableRow key={event.id}>
+                    <TableCell className="font-medium">{event.title}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          status === "Past"
+                            ? "outline"
+                            : status === "Ongoing"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                      >
+                        {status}
+                      </Badge>
                     </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>View Attendees</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+                    <TableCell>
+                      {format(eventDate, "MMM d, yyyy, p")}
+                    </TableCell>
+                    <TableCell>
+                      {event.venue.type === "online"
+                        ? "Online"
+                        : event.venue.details}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onSelect={() => router.push("/admin/events/new")}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem disabled>
+                            View Attendees
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                            onSelect={() => handleDeleteClick(event)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent className="glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              event "{eventToDelete?.title}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes, Delete Event
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
-
-    
