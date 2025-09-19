@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useContext } from "react";
@@ -24,10 +25,12 @@ import {
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { UserRole } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 export function UserNav() {
   const { user, logout, switchRole } = useContext(UserContext);
   const router = useRouter();
+  const { toast } = useToast();
 
   if (!user) {
     return null;
@@ -43,7 +46,11 @@ export function UserNav() {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    router.push("/");
   };
 
   const handleRoleSwitch = (role: UserRole) => {
