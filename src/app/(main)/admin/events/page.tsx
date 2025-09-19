@@ -151,7 +151,7 @@ export default function AdminEventsPage() {
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
                             onSelect={() => router.push("/admin/events/new")}
-                            disabled={status === 'Past'}
+                            disabled={status === 'Past' || status === 'Ongoing'}
                           >
                             Edit
                           </DropdownMenuItem>
