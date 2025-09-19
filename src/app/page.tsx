@@ -20,8 +20,8 @@ const LoadingScreen = () => {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <AppLogo />
@@ -30,10 +30,18 @@ const LoadingScreen = () => {
         className="text-lg font-semibold text-primary"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       >
         Indian Data Club
       </motion.p>
+      <div className="w-1/3 max-w-xs overflow-hidden rounded-full mt-2">
+         <motion.div
+          className="h-2 w-full bg-primary"
+          initial={{ x: "-100%" }}
+          animate={{ x: "0%" }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
+        />
+      </div>
     </div>
   );
 };
@@ -277,3 +285,5 @@ export default function Home() {
 
   return <HomePageContent />;
 }
+
+    
