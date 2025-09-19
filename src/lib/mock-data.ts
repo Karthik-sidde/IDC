@@ -7,6 +7,7 @@ export const mockUsers: User[] = [
     name: "Alex Doe",
     email: "alex.doe@example.com",
     role: "user",
+    status: "active",
     profile: {
       avatar: "https://picsum.photos/seed/avatar1/100/100",
       bio: "Tech enthusiast and event lover.",
@@ -17,6 +18,7 @@ export const mockUsers: User[] = [
     name: "Bernard Lane",
     email: "bernard.lane@example.com",
     role: "admin",
+    status: "active",
     profile: {
       avatar: "https://picsum.photos/seed/avatar2/100/100",
       bio: "Event organizer for tech conferences.",
@@ -27,6 +29,7 @@ export const mockUsers: User[] = [
     name: "Casey Smith",
     email: "casey.smith@example.com",
     role: "super_admin",
+    status: "active",
     profile: {
       avatar: "https://picsum.photos/seed/avatar3/100/100",
       bio: "Platform administrator.",
