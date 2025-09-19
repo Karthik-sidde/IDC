@@ -26,7 +26,7 @@ export default function MyEventsPage() {
     .filter((event) => event && event.date < new Date());
 
   const EventTicketCard = ({ event }: { event: any }) => (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+    <Card className="overflow-hidden transition-shadow hover:shadow-lg glass">
       <div className="flex flex-col sm:flex-row">
         <div className="relative h-40 w-full sm:w-48 flex-shrink-0">
           <Image
@@ -99,3 +99,5 @@ export default function MyEventsPage() {
     </div>
   );
 }
+
+    

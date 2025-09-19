@@ -21,7 +21,7 @@ export default function PlatformSettingsPage() {
         </p>
       </div>
 
-      <Card>
+      <Card className="glass">
         <CardHeader>
           <div className="flex items-center gap-3">
             <Palette className="h-6 w-6 text-primary" />
@@ -54,7 +54,7 @@ export default function PlatformSettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass">
         <CardHeader>
            <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-primary" />
@@ -91,3 +91,5 @@ export default function PlatformSettingsPage() {
     </div>
   );
 }
+
+    

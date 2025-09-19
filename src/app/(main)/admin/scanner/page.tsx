@@ -17,7 +17,7 @@ export default function QRScannerPage() {
           Use the camera to scan attendee QR codes for check-in.
         </p>
       </div>
-      <Card>
+      <Card className="glass">
         <CardContent className="p-6">
           <div className="aspect-square w-full rounded-lg bg-muted flex items-center justify-center">
             <div className="text-center text-muted-foreground">
@@ -34,3 +34,5 @@ export default function QRScannerPage() {
     </div>
   );
 }
+
+    

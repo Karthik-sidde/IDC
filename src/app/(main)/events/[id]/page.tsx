@@ -1,3 +1,5 @@
+"use client";
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { mockEvents, mockUsers } from '@/lib/mock-data';
@@ -12,21 +14,51 @@ import {
   Ticket,
   Users,
   Video,
+  CreditCard,
+  CheckCircle2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
+  const [isRegistered, setIsRegistered] = useState(false);
+  const { toast } = useToast();
+
   const event = mockEvents.find((e) => e.id === params.id);
   if (!event) {
     notFound();
   }
   const organizer = mockUsers.find((u) => u.id === event.organizerId);
+  const isFree = event.tickets.some(ticket => ticket.price === 0);
+
+  const handleRegister = () => {
+    // Simulate registration
+    setIsRegistered(true);
+    toast({
+      title: "Registration Successful!",
+      description: `You're all set for ${event.title}.`,
+      variant: "default",
+      className: "bg-green-500 text-white",
+    });
+  };
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
       {/* Hero Section */}
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden glass">
         <div className="relative h-64 w-full md:h-96">
           <Image
             src={event.coverImage}
@@ -69,7 +101,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="font-headline">Event Details</CardTitle>
             </CardHeader>
@@ -95,7 +127,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="font-headline">Tickets</CardTitle>
             </CardHeader>
@@ -112,7 +144,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
           </Card>
 
           {organizer && (
-            <Card>
+            <Card className="glass">
             <CardHeader>
               <CardTitle className="font-headline">Organizer</CardTitle>
             </CardHeader>
@@ -129,12 +161,43 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             </Card>
           )}
 
-          <Button size="lg" className="w-full hover:glow text-lg py-6">
-            <Ticket className="mr-2 h-5 w-5" />
-            Register Now
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered}>
+                {isRegistered ? (
+                  <>
+                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                    Registered
+                  </>
+                ) : (
+                  <>
+                    <Ticket className="mr-2 h-5 w-5" />
+                    Register Now
+                  </>
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {isFree
+                    ? `You are about to register for "${event.title}". This is a free event. Continue?`
+                    : `You are about to purchase a ticket for "${event.title}" for ₹${event.tickets[0].price.toFixed(2)}. This is a simulated payment.`}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRegister}>
+                  {isFree ? 'Confirm Registration' : 'Confirm Payment'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
   );
 }
+
+    

@@ -29,7 +29,7 @@ import {
 
 export default function AdminEventsPage() {
   return (
-    <Card>
+    <Card className="glass">
       <CardHeader>
         <div className="flex justify-between items-start">
             <div>
@@ -117,3 +117,5 @@ export default function AdminEventsPage() {
     </Card>
   );
 }
+
+    

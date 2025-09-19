@@ -26,7 +26,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Link href={`/events/${event.id}`}>
-      <Card className="group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
+      <Card className="group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1 glass">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
@@ -71,3 +71,5 @@ export function EventCard({ event }: EventCardProps) {
     </Link>
   );
 }
+
+    

@@ -27,7 +27,7 @@ export default function NewEventPage() {
         </p>
       </div>
 
-      <Card>
+      <Card className="glass">
         <CardHeader>
           <CardTitle>Event Details</CardTitle>
           <CardDescription>
@@ -71,7 +71,7 @@ export default function NewEventPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass">
         <CardHeader>
           <CardTitle>Venue & Ticketing</CardTitle>
           <CardDescription>
@@ -121,3 +121,5 @@ export default function NewEventPage() {
     </div>
   );
 }
+
+    

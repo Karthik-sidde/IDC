@@ -88,12 +88,14 @@ export default function AdminUsersPage() {
   };
 
   const handleOpenChangeRole = (user: User) => {
+    if (user.id === currentUser?.id) return;
     setSelectedUser(user);
     setNewRole(user.role);
     setIsChangeRoleOpen(true);
   };
 
   const handleOpenSuspendUser = (user: User) => {
+    if (user.id === currentUser?.id) return;
     setSelectedUser(user);
     setIsSuspendUserOpen(true);
   };
@@ -114,7 +116,7 @@ export default function AdminUsersPage() {
   };
 
   const handleChangeRole = () => {
-    if (selectedUser) {
+    if (selectedUser && canManageRoles) {
       setUsers(
         users.map((u) =>
           u.id === selectedUser.id ? { ...u, role: newRole } : u
@@ -129,7 +131,7 @@ export default function AdminUsersPage() {
     if (selectedUser) {
       setUsers(
         users.map((u) =>
-          u.id === selectedUser.id ? { ...u, status: "suspended" } : u
+          u.id === selectedUser.id ? { ...u, status: u.status === 'active' ? 'suspended' : 'active' } : u
         )
       );
     }
@@ -139,7 +141,7 @@ export default function AdminUsersPage() {
 
   return (
     <>
-      <Card>
+      <Card className="glass">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="font-headline">User Management</CardTitle>
@@ -195,7 +197,7 @@ export default function AdminUsersPage() {
                           aria-haspopup="true"
                           size="icon"
                           variant="ghost"
-                          disabled={user.status === 'suspended' || user.id === currentUser?.id}
+                          disabled={user.id === currentUser?.id}
                         >
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Toggle menu</span>
@@ -204,17 +206,17 @@ export default function AdminUsersPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem disabled>Edit User</DropdownMenuItem>
-                        {canManageRoles && (
+                        {canManageRoles && user.status === 'active' && (
                           <DropdownMenuItem onClick={() => handleOpenChangeRole(user)}>
                             Change Role
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                          className={user.status === 'active' ? "text-destructive focus:text-destructive focus:bg-destructive/10" : ""}
                           onClick={() => handleOpenSuspendUser(user)}
                         >
-                          Suspend User
+                          {user.status === 'active' ? 'Suspend User' : 'Reactivate User'}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -228,7 +230,7 @@ export default function AdminUsersPage() {
 
       {/* Add User Dialog */}
       <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-        <DialogContent>
+        <DialogContent className="glass">
           <DialogHeader>
             <DialogTitle>Add a New User</DialogTitle>
             <DialogDescription>
@@ -264,6 +266,7 @@ export default function AdminUsersPage() {
                 onValueChange={(value) =>
                   setNewUser({ ...newUser, role: value as UserRole })
                 }
+                disabled={!canManageRoles}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
@@ -291,7 +294,7 @@ export default function AdminUsersPage() {
 
       {/* Change Role Dialog */}
       <Dialog open={isChangeRoleOpen} onOpenChange={setIsChangeRoleOpen}>
-        <DialogContent>
+        <DialogContent className="glass">
           <DialogHeader>
             <DialogTitle>Change User Role</DialogTitle>
             <DialogDescription>
@@ -325,18 +328,19 @@ export default function AdminUsersPage() {
 
       {/* Suspend User Alert */}
       <AlertDialog open={isSuspendUserOpen} onOpenChange={setIsSuspendUserOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="glass">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will suspend {selectedUser?.name} and restrict their access
-              to the platform. This action can be undone later.
+              {selectedUser?.status === 'active'
+                ? `This will suspend ${selectedUser?.name} and restrict their access to the platform. This action can be undone later.`
+                : `This will reactivate ${selectedUser?.name}'s account and restore their access.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSuspendUser}>
-              Yes, Suspend User
+              {selectedUser?.status === 'active' ? 'Yes, Suspend User' : 'Yes, Reactivate User'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -344,3 +348,5 @@ export default function AdminUsersPage() {
     </>
   );
 }
+
+    
