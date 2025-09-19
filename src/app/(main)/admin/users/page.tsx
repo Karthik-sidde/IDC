@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { mockUsers } from "@/lib/mock-data";
 import { type User, type UserRole } from "@/lib/types";
+import { UserContext } from "@/context/UserContext";
 import {
   Table,
   TableBody,
@@ -19,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, PlusCircle, UserPlus, X } from "lucide-react";
+import { MoreHorizontal, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -60,6 +61,7 @@ import {
 } from "@/components/ui/select";
 
 export default function AdminUsersPage() {
+  const { user: currentUser } = useContext(UserContext);
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -71,6 +73,8 @@ export default function AdminUsersPage() {
     role: "user" as UserRole,
   });
   const [newRole, setNewRole] = useState<UserRole>("user");
+
+  const canManageRoles = currentUser?.role === "super_admin";
 
   const getRoleVariant = (role: string) => {
     switch (role) {
@@ -191,7 +195,7 @@ export default function AdminUsersPage() {
                           aria-haspopup="true"
                           size="icon"
                           variant="ghost"
-                          disabled={user.status === 'suspended'}
+                          disabled={user.status === 'suspended' || user.id === currentUser?.id}
                         >
                           <MoreHorizontal className="h-4 w-4" />
                           <span className="sr-only">Toggle menu</span>
@@ -200,9 +204,11 @@ export default function AdminUsersPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem disabled>Edit User</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenChangeRole(user)}>
-                          Change Role
-                        </DropdownMenuItem>
+                        {canManageRoles && (
+                          <DropdownMenuItem onClick={() => handleOpenChangeRole(user)}>
+                            Change Role
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive focus:bg-destructive/10"
@@ -264,8 +270,12 @@ export default function AdminUsersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  {canManageRoles && (
+                    <>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="super_admin">Super Admin</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -295,8 +305,12 @@ export default function AdminUsersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="user">User</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="super_admin">Super Admin</SelectItem>
+                 {canManageRoles && (
+                    <>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                    </>
+                 )}
               </SelectContent>
             </Select>
           </div>
