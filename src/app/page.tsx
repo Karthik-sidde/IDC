@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getMockEvents } from "@/lib/mock-data";
 import { EventCard } from "@/components/events/EventCard";
+import type { Event } from "@/lib/types";
 
 
 const LoadingScreen = () => {
@@ -47,7 +48,13 @@ const LoadingScreen = () => {
 const HomePageContent = () => {
   const router = useRouter();
   
-  const featuredEvents = getMockEvents().filter(e => e.date > new Date()).slice(0, 3);
+  const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    const allEvents = getMockEvents();
+    const upcomingEvents = allEvents.filter(e => e.date > new Date()).slice(0, 3);
+    setFeaturedEvents(upcomingEvents);
+  }, []);
   
   const containerVariants = {
     hidden: { opacity: 0 },

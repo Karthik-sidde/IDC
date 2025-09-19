@@ -34,7 +34,7 @@ import {
 import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/context/UserContext';
-import { type Ticket as TicketType } from '@/lib/types';
+import { type Ticket as TicketType, type Event } from '@/lib/types';
 import { LoginDialog } from '@/components/auth/LoginDialog';
 
 
@@ -44,24 +44,34 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const router = useRouter();
   const pathname = usePathname();
   
+  const [event, setEvent] = useState<Event | undefined>(undefined);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
 
+  useEffect(() => {
+    const foundEvent = getMockEvents().find((e) => e.id === params.id);
+    setEvent(foundEvent);
+  }, [params.id]);
 
-  const event = getMockEvents().find((e) => e.id === params.id);
 
   useEffect(() => {
     if (user && event) {
       const userTickets = getMockTickets();
       const hasTicket = userTickets.some(ticket => ticket.userId === user.id && ticket.eventId === event.id);
       setIsRegistered(hasTicket);
+    } else {
+        setIsRegistered(false);
     }
   }, [user, event]);
 
 
   if (!event) {
-    notFound();
+    // To be handled by loading state in a real app, for now it might flash notFound
+    const foundEvent = getMockEvents().find((e) => e.id === params.id);
+    if (!foundEvent) notFound();
+    setEvent(foundEvent);
+    return null; // Or a loading spinner
   }
   const organizer = mockUsers.find((u) => u.id === event.organizerId);
   const isFree = event.tickets.some(ticket => ticket.price === 0);

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { getMockTickets, getMockEvents } from '@/lib/mock-data';
@@ -15,18 +16,27 @@ import { Ticket, Calendar, Clock, ArrowRight, User, Mail, QrCode } from 'lucide-
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { UserContext } from '@/context/UserContext';
 import { type Event, type Ticket as TicketType } from '@/lib/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { useIsomorphicLayoutEffect } from 'framer-motion';
+
+type EventWithTicket = { event: Event, ticket: TicketType };
 
 export default function MyEventsPage() {
   const { user } = useContext(UserContext);
-  const [selectedTicket, setSelectedTicket] = useState<{event: Event, ticket: TicketType} | null>(null);
-
-  const { upcomingEvents, pastEvents, userTickets } = useMemo(() => {
-    if (!user) return { upcomingEvents: [], pastEvents: [], userTickets: [] };
+  const [selectedTicket, setSelectedTicket] = useState<EventWithTicket | null>(null);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventWithTicket[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventWithTicket[]>([]);
+  
+  useEffect(() => {
+    if (!user) {
+        setUpcomingEvents([]);
+        setPastEvents([]);
+        return;
+    };
 
     const tickets = getMockTickets().filter((t) => t.userId === user.id);
     const mockEvents = getMockEvents();
@@ -34,13 +44,16 @@ export default function MyEventsPage() {
     const eventsWithTickets = tickets.map((ticket) => {
         const event = mockEvents.find((e) => e.id === ticket.eventId);
         return event ? { event, ticket } : null;
-    }).filter((item): item is { event: Event, ticket: TicketType } => item !== null);
+    }).filter((item): item is EventWithTicket => item !== null);
 
-    const upcoming = eventsWithTickets.filter(({ event }) => event.date >= new Date());
-    const past = eventsWithTickets.filter(({ event }) => event.date < new Date());
+    const upcoming = eventsWithTickets.filter(({ event }) => new Date(event.date) >= new Date());
+    const past = eventsWithTickets.filter(({ event }) => new Date(event.date) < new Date());
     
-    return { upcomingEvents: upcoming, pastEvents: past, userTickets: tickets };
+    setUpcomingEvents(upcoming);
+    setPastEvents(past);
+
   }, [user]);
+
 
   const EventTicketCard = ({ event, ticket }: { event: Event, ticket: TicketType }) => (
     <Card className="overflow-hidden transition-shadow hover:shadow-lg glass">
@@ -59,9 +72,9 @@ export default function MyEventsPage() {
                 <CardTitle className="font-headline text-xl">{event.title}</CardTitle>
                 <CardDescription className="flex items-center gap-2 pt-1">
                     <Calendar className="h-4 w-4" />
-                    {format(event.date, 'EEE, MMM d, yyyy')}
+                    {format(new Date(event.date), 'EEE, MMM d, yyyy')}
                     <Clock className="ml-2 h-4 w-4" />
-                    {format(event.date, 'p')}
+                    {format(new Date(event.date), 'p')}
                 </CardDescription>
             </CardHeader>
             <CardFooter className="mt-auto pt-0 px-6 pb-4">
@@ -153,7 +166,7 @@ export default function MyEventsPage() {
                 </div>
                  <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{format(selectedTicket.event.date, 'EEEE, MMMM d, yyyy - p')}</span>
+                  <span className="font-medium">{format(new Date(selectedTicket.event.date), 'EEEE, MMMM d, yyyy - p')}</span>
                 </div>
               </div>
             </div>

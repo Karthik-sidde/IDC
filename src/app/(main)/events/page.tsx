@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EventCard } from "@/components/events/EventCard";
 import { getMockEvents, mockUsers, getMockTickets } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
@@ -17,9 +18,14 @@ import { getPersonalizedEventRecommendations } from "@/ai/flows/personalized-eve
 import { type Event } from "@/lib/types";
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(getMockEvents());
+  const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecommended, setIsRecommended] = useState(false);
+
+  useEffect(() => {
+    setEvents(getMockEvents());
+  }, []);
+
 
   const handleRecommendations = async () => {
     setIsLoading(true);

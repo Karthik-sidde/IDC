@@ -12,7 +12,7 @@ import { CreditCard, Lock, Loader2, CheckCircle } from 'lucide-react';
 import { getMockEvents, addMockTicket } from '@/lib/mock-data';
 import { UserContext } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
-import { type Ticket } from '@/lib/types';
+import { type Ticket, type Event } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 
 function PaymentPageContent() {
@@ -23,9 +23,20 @@ function PaymentPageContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
+  const [event, setEvent] = useState<Event | undefined>(undefined);
   
   const eventId = searchParams.get('eventId');
-  const event = getMockEvents().find(e => e.id === eventId);
+
+  useEffect(() => {
+    if (eventId) {
+      const foundEvent = getMockEvents().find(e => e.id === eventId);
+      if (foundEvent) {
+          setEvent(foundEvent);
+      } else {
+          notFound();
+      }
+    }
+  }, [eventId]);
 
   useEffect(() => {
     if (!user) {
@@ -33,8 +44,8 @@ function PaymentPageContent() {
     }
   }, [user, router]);
   
-  if (!event) {
-    notFound();
+  if (!eventId || !event) {
+    return null; // Or a loading spinner
   }
 
   const ticketInfo = event.tickets[0];
