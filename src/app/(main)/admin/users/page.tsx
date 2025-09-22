@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, UserPlus } from "lucide-react";
+import { MoreHorizontal, UserPlus, CheckCircle, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -59,6 +59,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsersPage() {
   const { user: currentUser } = useContext(UserContext);
@@ -67,12 +68,14 @@ export default function AdminUsersPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
   const [isSuspendUserOpen, setIsSuspendUserOpen] = useState(false);
+  const [isApproveSpeakerOpen, setIsApproveSpeakerOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     role: "user" as UserRole,
   });
   const [newRole, setNewRole] = useState<UserRole>("user");
+  const { toast } = useToast();
 
   const canManageRoles = currentUser?.role === "super_admin";
 
@@ -82,10 +85,21 @@ export default function AdminUsersPage() {
         return "destructive";
       case "admin":
         return "secondary";
+      case "speaker":
+        return "default";
       default:
         return "outline";
     }
   };
+
+  const getVerificationStatusVariant = (status?: string) => {
+    switch(status) {
+        case 'approved': return 'secondary';
+        case 'pending': return 'default';
+        case 'rejected': return 'destructive';
+        default: return 'outline';
+    }
+  }
 
   const handleOpenChangeRole = (user: User) => {
     if (user.id === currentUser?.id) return;
@@ -99,6 +113,11 @@ export default function AdminUsersPage() {
     setSelectedUser(user);
     setIsSuspendUserOpen(true);
   };
+
+  const handleOpenApproveSpeaker = (user: User) => {
+    setSelectedUser(user);
+    setIsApproveSpeakerOpen(true);
+  }
 
   const handleAddUser = () => {
     const userToAdd: User = {
@@ -138,6 +157,22 @@ export default function AdminUsersPage() {
     setIsSuspendUserOpen(false);
     setSelectedUser(null);
   };
+
+  const handleApproveSpeaker = () => {
+     if (selectedUser) {
+      setUsers(
+        users.map((u) =>
+          u.id === selectedUser.id ? { ...u, verificationStatus: 'approved' } : u
+        )
+      );
+       toast({
+        title: "Speaker Approved",
+        description: `${selectedUser.name} can now create events.`,
+      });
+    }
+    setIsApproveSpeakerOpen(false);
+    setSelectedUser(null);
+  }
 
   return (
     <>
@@ -180,9 +215,16 @@ export default function AdminUsersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleVariant(user.role)} className="capitalize">
-                      {user.role.replace("_", " ")}
-                    </Badge>
+                     <div className="flex items-center gap-2">
+                        <Badge variant={getRoleVariant(user.role)} className="capitalize">
+                          {user.role.replace("_", " ")}
+                        </Badge>
+                        {user.role === 'speaker' && (
+                             <Badge variant={getVerificationStatusVariant(user.verificationStatus)} className="capitalize">
+                                {user.verificationStatus}
+                            </Badge>
+                        )}
+                     </div>
                   </TableCell>
                    <TableCell>
                     <Badge variant={user.status === 'active' ? 'secondary' : 'destructive'} className="capitalize">
@@ -205,6 +247,12 @@ export default function AdminUsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {user.role === 'speaker' && user.verificationStatus === 'pending' && (
+                            <DropdownMenuItem onClick={() => handleOpenApproveSpeaker(user)}>
+                                <CheckCircle className="mr-2 h-4 w-4"/>
+                                Approve Speaker
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem disabled>Edit User</DropdownMenuItem>
                         {canManageRoles && user.status === 'active' && (
                           <DropdownMenuItem onClick={() => handleOpenChangeRole(user)}>
@@ -273,6 +321,7 @@ export default function AdminUsersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="speaker">Speaker</SelectItem>
                   {canManageRoles && (
                     <>
                       <SelectItem value="admin">Admin</SelectItem>
@@ -308,6 +357,7 @@ export default function AdminUsersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="user">User</SelectItem>
+                <SelectItem value="speaker">Speaker</SelectItem>
                  {canManageRoles && (
                     <>
                         <SelectItem value="admin">Admin</SelectItem>
@@ -341,6 +391,24 @@ export default function AdminUsersPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSuspendUser}>
               {selectedUser?.status === 'active' ? 'Yes, Suspend User' : 'Yes, Reactivate User'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Approve Speaker Alert */}
+      <AlertDialog open={isApproveSpeakerOpen} onOpenChange={setIsApproveSpeakerOpen}>
+        <AlertDialogContent className="glass">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve Speaker?</AlertDialogTitle>
+            <AlertDialogDescription>
+                Are you sure you want to approve {selectedUser?.name} as a speaker? They will be able to create and manage events.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleApproveSpeaker}>
+              Yes, Approve
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

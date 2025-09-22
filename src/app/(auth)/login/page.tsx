@@ -3,7 +3,7 @@
 
 import { useState, useContext } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { AtSign, KeyRound, Loader2, LogIn, PartyPopper, User } from "lucide-react";
+import { AtSign, KeyRound, Loader2, LogIn, PartyPopper, User, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,9 +19,14 @@ import { UserContext } from "@/context/UserContext";
 import { AppLogo } from "@/components/AppLogo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
+import { type UserRole } from "@/lib/types";
+import { addMockUser } from "@/lib/mock-data";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("alex.doe@example.com");
+  const [name, setName] = useState("Alex Doe");
+  const [role, setRole] = useState<UserRole>("user");
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const router = useRouter();
@@ -33,7 +38,7 @@ export default function LoginPage() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      login(email, "user");
+      login(email);
       setIsLoading(false);
       const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
       sessionStorage.removeItem('redirectAfterLogin');
@@ -45,15 +50,34 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setIsRegistering(true);
+    
     // Simulate API call for registration
     setTimeout(() => {
-      // For mock purposes, we'll just log in the new user as a 'user'
-      login(email, "user");
+      const newUser = {
+        id: `user-${Date.now()}`,
+        name,
+        email,
+        role,
+        status: "active" as const,
+        verificationStatus: role === 'speaker' ? 'pending' as const : undefined,
+        profile: {
+          avatar: `https://picsum.photos/seed/${Date.now()}/100/100`,
+          bio: "",
+        },
+      };
+      addMockUser(newUser);
+      login(email);
+
       setIsLoading(false);
       setIsRegistering(false);
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
-      sessionStorage.removeItem('redirectAfterLogin');
-      router.push(redirectPath);
+      
+      if (role === 'speaker') {
+        router.push('/speaker-verification');
+      } else {
+        const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
+        sessionStorage.removeItem('redirectAfterLogin');
+        router.push(redirectPath);
+      }
     }, 1000);
   };
 
@@ -127,8 +151,29 @@ export default function LoginPage() {
            <form onSubmit={handleRegister}>
             <CardContent className="space-y-4">
                <CardDescription className="text-center">
-                Create a new attendee account.
+                Create a new account.
               </CardDescription>
+
+              <div className="space-y-2">
+                <Label>I want to sign up as a...</Label>
+                <RadioGroup
+                    defaultValue={role}
+                    onValueChange={(value) => setRole(value as UserRole)}
+                    className="grid grid-cols-2 gap-4"
+                >
+                    <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="user" id="r-user" className="sr-only"/>
+                        <User className="mb-3 h-6 w-6" />
+                        Attendee
+                    </Label>
+                    <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="speaker" id="r-speaker" className="sr-only"/>
+                        <Mic className="mb-3 h-6 w-6" />
+                        Speaker
+                    </Label>
+                </RadioGroup>
+              </div>
+
                 <div className="space-y-2">
                 <Label htmlFor="register-name">Name</Label>
                 <div className="relative">
@@ -138,6 +183,7 @@ export default function LoginPage() {
                     type="text"
                     placeholder="Alex Doe"
                     required
+                    onChange={(e) => setName(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -188,5 +234,3 @@ export default function LoginPage() {
     </Card>
   );
 }
-
-    

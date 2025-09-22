@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -26,9 +26,13 @@ import { addMockEvent } from "@/lib/mock-data";
 import { type Event } from "@/lib/types";
 import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { UserContext } from "@/context/UserContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ShieldAlert } from "lucide-react";
 
 export default function NewEventPage() {
   const router = useRouter();
+  const { user } = useContext(UserContext);
   const { toast } = useToast();
   const [title, setTitle] = useState("My Awesome Event");
   const [description, setDescription] = useState("This is a description of my awesome event.");
@@ -40,20 +44,22 @@ export default function NewEventPage() {
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketQuantity, setTicketQuantity] = useState(100);
   const [eventType, setEventType] = useState<"free" | "paid">("paid");
+  
+  const canCreateEvent = user?.role.includes('admin') || (user?.role === 'speaker' && user?.verificationStatus === 'approved');
 
   useEffect(() => {
     if (eventType === "free") {
       setTicketPrice(0);
     } else {
-      // Optionally reset to a default price or leave as is
       if (ticketPrice === 0) {
-        setTicketPrice(10); // Default price for paid events
+        setTicketPrice(10);
       }
     }
-  }, [eventType]);
+  }, [eventType, ticketPrice]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user || !canCreateEvent) return;
 
     const newEvent: Event = {
       id: `event-${Date.now()}`,
@@ -72,7 +78,7 @@ export default function NewEventPage() {
           quantity: Number(ticketQuantity),
         },
       ],
-      organizerId: "admin-1", // Assuming current admin is the organizer
+      organizerId: user.id,
       coverImage: `https://picsum.photos/seed/event${Date.now()}/600/400`,
     };
 
@@ -85,6 +91,22 @@ export default function NewEventPage() {
 
     router.push("/admin/events");
   };
+  
+  if (!canCreateEvent) {
+    return (
+        <div className="mx-auto max-w-3xl space-y-6">
+             <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Access Denied</AlertTitle>
+                <AlertDescription>
+                    {user?.role === 'speaker' && user?.verificationStatus === 'pending'
+                    ? 'Your speaker application is under review. You can create events once you are approved.'
+                    : 'You do not have permission to create events.'}
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-6">

@@ -7,7 +7,7 @@ import { type User, type UserRole, mockUsers } from "@/lib/mock-data";
 interface UserContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, role: UserRole) => void;
+  login: (email: string) => void;
   logout: () => void;
   setUser: (user: User) => void;
 }
@@ -38,19 +38,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (email: string, role: UserRole) => {
+  const login = (email: string, asRole?: UserRole) => {
     setLoading(true);
     // Find a user that matches the email or just the role for mock purposes
     let foundUser = mockUsers.find(
       (u) => u.email === email
     );
-    // If we're logging in from admin page, ensure it's an admin/super_admin
-    if (role.includes('admin') && foundUser && !foundUser.role.includes('admin')) {
-      foundUser = undefined;
-    }
 
-    if (!foundUser) {
-        foundUser = mockUsers.find((u) => u.role === role);
+    // If logging in from admin, ensure it's an admin/super_admin
+    if (asRole?.includes('admin') && foundUser && !foundUser.role.includes('admin')) {
+      // If email exists but is not admin, deny login from admin page
+      foundUser = undefined;
+    } else if (asRole?.includes('admin') && !foundUser) {
+      // If no user with that email, try to find any admin
+      foundUser = mockUsers.find((u) => u.role === asRole);
     }
 
 

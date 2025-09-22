@@ -28,7 +28,9 @@ import {
   LogOut,
   ChevronRight,
   Shield,
-  LogIn
+  LogIn,
+  Mic,
+  FileCheck
 } from "lucide-react";
 import { useContext } from "react";
 import { UserContext } from "@/context/UserContext";
@@ -48,7 +50,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const menuItems = [
     {
-      role: ["user", "admin", "super_admin", "guest"],
+      role: ["user", "admin", "super_admin", "guest", "speaker"],
       href: "/events",
       icon: Calendar,
       label: "Browse Events",
@@ -58,6 +60,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       href: "/my-events",
       icon: Ticket,
       label: "My Tickets",
+    },
+    {
+      role: ["speaker"],
+      href: "/speaker-verification",
+      icon: FileCheck,
+      label: "Verification",
+      condition: (user: any) => user?.verificationStatus === 'pending',
+    },
+    {
+      role: ["admin", "super_admin", "speaker"],
+      href: "/admin/events/new",
+      icon: Mic,
+      label: "Create Event",
+      group: "Hosting",
+      condition: (user: any) => user?.role.includes('admin') || user?.verificationStatus === 'approved',
     },
     {
       role: ["admin", "super_admin"],
@@ -99,7 +116,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const currentUserRole = user?.role || "guest";
 
   const userMenu = menuItems.filter(
-    (item) => !item.group && item.role.includes(currentUserRole)
+    (item) => !item.group && item.role.includes(currentUserRole) && (!item.condition || item.condition(user))
+  );
+  const hostingMenu = menuItems.filter(
+    (item) => item.group === "Hosting" && user && item.role.includes(user.role) && (!item.condition || item.condition(user))
   );
   const adminMenu = menuItems.filter(
     (item) => item.group === "Admin" && user && item.role.includes(user.role)
@@ -110,7 +130,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   
   const getPageTitle = () => {
     if (pathname === '/') return 'Home';
-    const allMenus = [...userMenu, ...adminMenu, ...superAdminMenu];
+    const allMenus = [...userMenu, ...hostingMenu, ...adminMenu, ...superAdminMenu];
     const
  
 activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !== '/');
@@ -141,6 +161,26 @@ activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !
               ))}
             </SidebarMenu>
           </SidebarGroup>
+          
+          {hostingMenu.length > 0 && (
+             <SidebarGroup>
+                <SidebarGroupLabel className="font-headline">Hosting</SidebarGroupLabel>
+                 <SidebarMenu>
+                    {hostingMenu.map((item) => (
+                        <SidebarMenuItem key={item.href}>
+                            <SidebarMenuButton
+                            onClick={() => router.push(item.href)}
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={item.label}
+                            >
+                                <item.icon />
+                                <span>{item.label}</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            </SidebarGroup>
+          )}
 
           {adminMenu.length > 0 && (
             <SidebarGroup>

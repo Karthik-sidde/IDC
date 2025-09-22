@@ -1,4 +1,4 @@
-export type UserRole = "super_admin" | "admin" | "user";
+export type UserRole = "super_admin" | "admin" | "user" | "speaker";
 
 export interface User {
   id: string;
@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: UserRole;
   status: "active" | "suspended";
+  verificationStatus?: "pending" | "approved" | "rejected";
   profile: {
     avatar: string;
     bio: string;

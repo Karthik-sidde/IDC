@@ -37,6 +37,30 @@ export const mockUsers: User[] = [
       bio: "Platform administrator.",
     },
   },
+  {
+    id: "speaker-1",
+    name: "Diana Prince",
+    email: "diana.prince@example.com",
+    role: "speaker",
+    status: "active",
+    verificationStatus: "pending",
+    profile: {
+      avatar: "https://picsum.photos/seed/avatar4/100/100",
+      bio: "Expert in decentralized systems and blockchain technology.",
+    },
+  },
+    {
+    id: "speaker-2",
+    name: "Elon Musk",
+    email: "elon.musk@example.com",
+    role: "speaker",
+    status: "active",
+    verificationStatus: "approved",
+    profile: {
+      avatar: "https://picsum.photos/seed/avatar5/100/100",
+      bio: "Works on sustainable energy and space exploration.",
+    },
+  },
 ];
 
 const mockEvents: Event[] = [
@@ -51,7 +75,7 @@ const mockEvents: Event[] = [
       details: "Metropolis Convention Center",
     },
     tickets: [{ tier: "General Admission", price: 199, quantity: 500 }],
-    organizerId: "admin-1",
+    organizerId: "speaker-2",
     coverImage: "https://picsum.photos/seed/event1/600/400",
   },
   {
@@ -96,7 +120,7 @@ const mockEvents: Event[] = [
       details: "https://zoom.us/j/1234567890",
     },
     tickets: [{ tier: "Online Access", price: 25, quantity: 1000 }],
-    organizerId: "admin-1",
+    organizerId: "speaker-2",
     coverImage: "https://picsum.photos/seed/event4/600/400",
   },
   {
@@ -163,6 +187,11 @@ export const getMockTickets = () => mockTickets;
 export const addMockTicket = (ticket: Ticket) => {
   mockTickets.push(ticket);
 };
+
+// Function to add a user
+export const addMockUser = (user: User) => {
+    mockUsers.push(user);
+}
 
 // Also export the raw data for cases where we don't want to use the functions
 export type { User, Event, Ticket, UserRole } from "./types";
