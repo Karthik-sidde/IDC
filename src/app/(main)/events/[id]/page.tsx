@@ -34,7 +34,7 @@ import {
 import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/context/UserContext';
-import { type Ticket as TicketType, type Event } from '@/lib/types';
+import { type Ticket as TicketType, type Event, type User } from '@/lib/types';
 import { LoginDialog } from '@/components/auth/LoginDialog';
 
 
@@ -46,6 +46,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   
   const [event, setEvent] = useState<Event | undefined>(undefined);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [attendees, setAttendees] = useState<User[]>([]);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
 
@@ -56,12 +57,17 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
 
   useEffect(() => {
-    if (user && event) {
-      const userTickets = getMockTickets();
-      const hasTicket = userTickets.some(ticket => ticket.userId === user.id && ticket.eventId === event.id);
-      setIsRegistered(hasTicket);
-    } else {
-        setIsRegistered(false);
+    if (event) {
+        const userTickets = getMockTickets().filter(ticket => ticket.eventId === event.id);
+        const attendeeUsers = mockUsers.filter(u => userTickets.some(ticket => ticket.userId === u.id));
+        setAttendees(attendeeUsers);
+
+        if (user) {
+            const hasTicket = userTickets.some(ticket => ticket.userId === user.id);
+            setIsRegistered(hasTicket);
+        } else {
+            setIsRegistered(false);
+        }
     }
   }, [user, event]);
 
@@ -102,6 +108,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
     addMockTicket(newTicket);
     setIsRegistered(true);
+    setAttendees([...attendees, user]);
 
     toast({
       title: "Registration Successful!",
@@ -134,6 +141,10 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
         )}
       </Button>
   );
+
+  const MAX_DISPLAY_ATTENDEES = 7;
+  const remainingAttendees = attendees.length > MAX_DISPLAY_ATTENDEES ? attendees.length - MAX_DISPLAY_ATTENDEES : 0;
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -222,6 +233,30 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
               ))}
             </CardContent>
           </Card>
+
+            {attendees.length > 0 && (
+                <Card className="glass">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2">
+                            <Users className='h-5 w-5' />
+                            {attendees.length} Attendees
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap items-center gap-2">
+                        {attendees.slice(0, MAX_DISPLAY_ATTENDEES).map(attendee => (
+                           <Avatar key={attendee.id} className="h-10 w-10 border-2 border-background">
+                                <AvatarImage src={attendee.profile.avatar} alt={attendee.name} />
+                                <AvatarFallback>{attendee.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        ))}
+                         {remainingAttendees > 0 && (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground border-2 border-background">
+                                +{remainingAttendees}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
           {organizer && (
             <Card className="glass">
