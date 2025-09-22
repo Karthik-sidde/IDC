@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: UserRole;
   status: "active" | "suspended";
+  emailVerified: boolean;
   verificationStatus?: "pending" | "approved" | "rejected";
   profile: {
     avatar: string;

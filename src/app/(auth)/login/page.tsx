@@ -20,8 +20,9 @@ import { AppLogo } from "@/components/AppLogo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { type UserRole } from "@/lib/types";
-import { addMockUser } from "@/lib/mock-data";
+import { addMockUser, mockUsers } from "@/lib/mock-data";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("alex.doe@example.com");
@@ -32,14 +33,28 @@ export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { login } = useContext(UserContext);
+  const { toast } = useToast();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
+
     setTimeout(() => {
+      const userToLogin = mockUsers.find(u => u.email === email);
+      if (userToLogin && !userToLogin.emailVerified) {
+          toast({
+            variant: "destructive",
+            title: "Email Not Verified",
+            description: "Please verify your email before logging in.",
+          });
+          router.push(`/verify-email?email=${email}`);
+          setIsLoading(false);
+          return;
+      }
+
       login(email);
       setIsLoading(false);
+      
       const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
       sessionStorage.removeItem('redirectAfterLogin');
       router.push(redirectPath);
@@ -48,10 +63,20 @@ export default function LoginPage() {
   
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const existingUser = mockUsers.find(u => u.email === email);
+    if (existingUser) {
+        toast({
+            variant: "destructive",
+            title: "User Exists",
+            description: "A user with this email already exists. Please sign in.",
+        });
+        return;
+    }
+
     setIsLoading(true);
     setIsRegistering(true);
     
-    // Simulate API call for registration
     setTimeout(() => {
       const newUser = {
         id: `user-${Date.now()}`,
@@ -59,6 +84,7 @@ export default function LoginPage() {
         email,
         role,
         status: "active" as const,
+        emailVerified: false,
         verificationStatus: role === 'speaker' ? 'pending' as const : undefined,
         profile: {
           avatar: `https://picsum.photos/seed/${Date.now()}/100/100`,
@@ -66,18 +92,16 @@ export default function LoginPage() {
         },
       };
       addMockUser(newUser);
-      login(email);
 
       setIsLoading(false);
       setIsRegistering(false);
       
-      if (role === 'speaker') {
-        router.push('/speaker-verification');
-      } else {
-        const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectPath);
-      }
+      router.push(`/verify-email?email=${email}`);
+      toast({
+        title: "Registration Successful!",
+        description: "Please check your email to verify your account.",
+      });
+
     }, 1000);
   };
 
@@ -134,9 +158,6 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full hover:glow"
                 disabled={isLoading}
-                onClick={() => {
-                  if (pathname) sessionStorage.setItem('redirectAfterLogin', pathname);
-                }}
               >
                 {isLoading && !isRegistering ? <Loader2 className="animate-spin" /> : <LogIn />}
                 <span>Sign In</span>
@@ -220,9 +241,6 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full hover:glow"
                 disabled={isLoading}
-                 onClick={() => {
-                  if (pathname) sessionStorage.setItem('redirectAfterLogin', pathname);
-                }}
               >
                 {isLoading && isRegistering ? <Loader2 className="animate-spin" /> : <PartyPopper />}
                 <span>Create Account</span>

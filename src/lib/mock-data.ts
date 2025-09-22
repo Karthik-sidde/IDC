@@ -1,13 +1,14 @@
 import type { User, Event, Ticket } from "./types";
 import { subDays, addDays } from "date-fns";
 
-export const mockUsers: User[] = [
+export let mockUsers: User[] = [
   {
     id: "user-1",
     name: "Alex Doe",
     email: "alex.doe@example.com",
     role: "user",
     status: "active",
+    emailVerified: true,
     profile: {
       avatar: "https://picsum.photos/seed/avatar1/100/100",
       bio: "Tech enthusiast and event lover.",
@@ -21,6 +22,7 @@ export const mockUsers: User[] = [
     email: "bernard.lane@example.com",
     role: "admin",
     status: "active",
+    emailVerified: true,
     profile: {
       avatar: "https://picsum.photos/seed/avatar2/100/100",
       bio: "Event organizer for tech conferences.",
@@ -32,6 +34,7 @@ export const mockUsers: User[] = [
     email: "casey.smith@example.com",
     role: "super_admin",
     status: "active",
+    emailVerified: true,
     profile: {
       avatar: "https://picsum.photos/seed/avatar3/100/100",
       bio: "Platform administrator.",
@@ -43,6 +46,7 @@ export const mockUsers: User[] = [
     email: "diana.prince@example.com",
     role: "speaker",
     status: "active",
+    emailVerified: true,
     verificationStatus: "pending",
     profile: {
       avatar: "https://picsum.photos/seed/avatar4/100/100",
@@ -55,6 +59,7 @@ export const mockUsers: User[] = [
     email: "elon.musk@example.com",
     role: "speaker",
     status: "active",
+    emailVerified: true,
     verificationStatus: "approved",
     profile: {
       avatar: "https://picsum.photos/seed/avatar5/100/100",
@@ -190,7 +195,14 @@ export const addMockTicket = (ticket: Ticket) => {
 
 // Function to add a user
 export const addMockUser = (user: User) => {
-    mockUsers.push(user);
+    const existingUser = mockUsers.find(u => u.email === user.email);
+    if (!existingUser) {
+        mockUsers.push(user);
+    }
+}
+
+export const verifyUserEmail = (email: string) => {
+    mockUsers = mockUsers.map(u => u.email === email ? { ...u, emailVerified: true } : u);
 }
 
 // Also export the raw data for cases where we don't want to use the functions
