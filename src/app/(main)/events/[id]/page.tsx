@@ -178,6 +178,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                     <TabsTrigger value="overview" className='flex-1'>Overview</TabsTrigger>
                     <TabsTrigger value="schedule" className='flex-1'>Schedule</TabsTrigger>
                     <TabsTrigger value="speakers" className='flex-1'>Speakers</TabsTrigger>
+                    <TabsTrigger value="attendees" className='flex-1'>Attendees ({attendees.length})</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className='mt-6 text-foreground/90'>
                     <p className='whitespace-pre-wrap leading-relaxed'>{event.description}</p>
@@ -187,6 +188,23 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 </TabsContent>
                  <TabsContent value="speakers" className='mt-6'>
                     <p>Speaker information will be displayed here.</p>
+                </TabsContent>
+                <TabsContent value="attendees" className='mt-6'>
+                    {attendees.length > 0 ? (
+                        <div className="flex flex-wrap items-center gap-4">
+                            {attendees.map(attendee => (
+                               <div key={attendee.id} className="flex flex-col items-center gap-2 text-center">
+                                    <Avatar className="h-16 w-16 border-2 border-primary">
+                                        <AvatarImage src={attendee.profile.avatar} alt={attendee.name} />
+                                        <AvatarFallback>{attendee.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-sm font-medium">{attendee.name}</span>
+                               </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-muted-foreground text-center py-4">No attendees have registered yet. Be the first!</p>
+                    )}
                 </TabsContent>
             </Tabs>
         </div>
@@ -234,30 +252,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
               ))}
             </CardContent>
           </Card>
-
-            {attendees.length > 0 && (
-                <Card className="glass">
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2">
-                            <Users className='h-5 w-5' />
-                            {attendees.length} Attendees
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-wrap items-center gap-2">
-                        {attendees.slice(0, MAX_DISPLAY_ATTENDEES).map(attendee => (
-                           <Avatar key={attendee.id} className="h-10 w-10 border-2 border-background">
-                                <AvatarImage src={attendee.profile.avatar} alt={attendee.name} />
-                                <AvatarFallback>{attendee.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                        ))}
-                         {remainingAttendees > 0 && (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground border-2 border-background">
-                                +{remainingAttendees}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            )}
 
           {organizer && (
             <Card className="glass">
@@ -318,5 +312,3 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
-
-    
