@@ -84,6 +84,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   const handleRegisterClick = () => {
     if (!user) {
+        sessionStorage.setItem('redirectAfterLogin', pathname);
         setIsLoginDialogOpen(true);
     } else {
         // If user is logged in and event is not free, go to payment
@@ -282,7 +283,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 <AlertDialogTrigger asChild>
                   <RegisterButton />
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className='glass'>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -317,3 +318,5 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
+    

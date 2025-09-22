@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useContext } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AtSign, KeyRound, Loader2, LogIn, PartyPopper, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { login } = useContext(UserContext);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -109,6 +110,9 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full hover:glow"
                 disabled={isLoading}
+                onClick={() => {
+                  if (pathname) sessionStorage.setItem('redirectAfterLogin', pathname);
+                }}
               >
                 {isLoading && !isRegistering ? <Loader2 className="animate-spin" /> : <LogIn />}
                 <span>Sign In</span>
@@ -170,6 +174,9 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full hover:glow"
                 disabled={isLoading}
+                 onClick={() => {
+                  if (pathname) sessionStorage.setItem('redirectAfterLogin', pathname);
+                }}
               >
                 {isLoading && isRegistering ? <Loader2 className="animate-spin" /> : <PartyPopper />}
                 <span>Create Account</span>
