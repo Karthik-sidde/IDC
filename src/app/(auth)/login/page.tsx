@@ -206,7 +206,7 @@ export default function LoginPage() {
               </CardDescription>
               
               <div className="space-y-3">
-                  <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100">
+                  <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
                     <CodebasicsIcon className="mr-2 h-5 w-5" />
                     Continue with Codebasics
                   </Button>
