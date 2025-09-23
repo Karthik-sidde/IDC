@@ -27,7 +27,7 @@ const Orbit = ({
     animate={{ rotate: 360 }}
     transition={{
       duration,
-      ease: "linear",
+      ease: [0.36, 0, 0.64, 1], // Custom cubic-bezier for a non-linear "uncertain" feel
       repeat: Infinity,
       delay,
     }}
@@ -40,12 +40,10 @@ const Node = ({
   x,
   y,
   delay,
-  isNucleus = false,
 }: {
   x: string;
   y: string;
   delay: number;
-  isNucleus?: boolean;
 }) => (
   <motion.div
     className="absolute rounded-full bg-primary"
