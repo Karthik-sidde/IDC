@@ -33,10 +33,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 type ScanResult = {
   status: "success" | "already_scanned" | "invalid";
@@ -79,12 +79,11 @@ export default function QRScannerPage() {
                 const ticket = getMockTickets().find(t => t.qrCode === ticketId);
                 
                 if (ticket) {
+                    const user = mockUsers.find(u => u.id === ticket.userId);
                     if (scannedTickets.has(ticket.id)) {
-                        const user = mockUsers.find(u => u.id === ticket.userId);
                         setScanResult({ status: 'already_scanned', ticket, user: user! });
                     } else {
                         scannedTickets.add(ticket.id);
-                        const user = mockUsers.find(u => u.id === ticket.userId);
                         setScanResult({ status: 'success', ticket, user: user! });
                     }
                 } else {
@@ -256,10 +255,12 @@ export default function QRScannerPage() {
                                     <span className="text-muted-foreground">Tier</span>
                                     <span className="font-medium">{scanResult.ticket.tierName}</span>
                                 </div>
+                                 <Separator className="my-1" />
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Price</span>
                                     <span className="font-medium">₹{scanResult.ticket.price}</span>
                                 </div>
+                                <Separator className="my-1" />
                                  <div className="flex justify-between">
                                     <span className="text-muted-foreground">Status</span>
                                     <span className="font-medium capitalize">{scanResult.ticket.status}</span>
