@@ -28,7 +28,7 @@ export function EventCard({ event }: EventCardProps) {
   const now = new Date();
   const eventDate = new Date(event.date);
   
-  const isPast = isBefore(eventDate, startOfToday());
+  const isPast = isBefore(eventDate, now);
   const isOngoing = !isPast && isBefore(eventDate, addDays(now, 2));
 
 
