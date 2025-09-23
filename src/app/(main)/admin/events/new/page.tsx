@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { ImageDropzone } from "@/components/ImageDropzone";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -76,14 +77,15 @@ export default function NewEventPage() {
     }
   }, [eventType, ticketPrice]);
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = (file: File | null) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
     }
   };
 
@@ -296,19 +298,15 @@ export default function NewEventPage() {
         <CardHeader>
           <CardTitle>Cover Image</CardTitle>
           <CardDescription>
-            Upload a cover image for your event.
+            Upload a cover image for your event. A good image makes your event stand out.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-            <div className="space-y-2">
-            <Label htmlFor="cover-image-upload">Upload Cover Image</Label>
-            <Input id="cover-image-upload" type="file" accept="image/*" onChange={handleFileChange} disabled={isPublishing}/>
-            {imagePreview && (
-                <div className="relative mt-4 h-48 w-full rounded-md border">
-                    <Image src={imagePreview} alt="Image preview" fill className="object-cover rounded-md" />
-                </div>
-            )}
-            </div>
+        <CardContent>
+             <ImageDropzone 
+                onFileChange={handleFileChange}
+                preview={imagePreview}
+                disabled={isPublishing}
+            />
         </CardContent>
       </Card>
 
