@@ -29,38 +29,6 @@ const Node = ({ x, y, delay }: { x: string; y: string; delay: number }) => (
   />
 );
 
-const Connector = ({
-  x1,
-  y1,
-  x2,
-  y2,
-  delay,
-}: {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  delay: number;
-}) => {
-  const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-
-  return (
-    <motion.div
-      className="absolute h-px origin-left bg-gradient-to-r from-primary to-primary/30"
-      style={{
-        left: `${x1}px`,
-        top: `${y1}px`,
-        width: `${length}px`,
-        transform: `rotate(${angle}deg)`,
-      }}
-      initial={{ scaleX: 0 }}
-      animate={{ scaleX: 1 }}
-      transition={{ duration: 0.7, delay, ease: "easeOut" }}
-    />
-  );
-};
-
 export const AnimatedDiagram = () => {
     const size = 300;
   return (
@@ -97,17 +65,6 @@ export const AnimatedDiagram = () => {
             <Node x="70%" y="70%" delay={0.8} />
             <Node x="100%" y="70%" delay={0.9} />
             <Node x="50%" y="100%" delay={1.0} />
-
-            {/* Connectors as traveling light beams */}
-            <Connector x1={size*0.5} y1={size*0} x2={size*0.15} y2={size*0.25} delay={1.2} />
-            <Connector x1={size*0.15} y1={size*0.25} x2={size*0} y2={size*0.7} delay={1.4} />
-            <Connector x1={size*0} y1={size*0.7} x2={size*0.3} y2={size*0.7} delay={1.6} />
-            <Connector x1={size*0.3} y1={size*0.7} x2={size*0.5} y2={size*1} delay={1.8} />
-            <Connector x1={size*0.5} y1={size*1} x2={size*0.7} y2={size*0.7} delay={2.0} />
-            <Connector x1={size*0.7} y1={size*0.7} x2={size*1} y2={size*0.7} delay={2.2} />
-            <Connector x1={size*1} y1={size*0.7} x2={size*0.85} y2={size*0.25} delay={2.4} />
-            <Connector x1={size*0.85} y1={size*0.25} x2={size*0.5} y2={size*0} delay={2.6} />
-
         </div>
     </div>
   );
