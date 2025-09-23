@@ -98,15 +98,6 @@ export const AnimatedDiagram = () => {
             <Node x="100%" y="70%" delay={0.9} />
             <Node x="50%" y="100%" delay={1.0} />
 
-            {/* Connectors */}
-            <Connector x1={size*0.5+6} y1={6} x2={size*0.15+6} y2={size*0.25+6} delay={1.1} />
-            <Connector x1={size*0.5+6} y1={6} x2={size*0.85+6} y2={size*0.25+6} delay={1.2} />
-            <Connector x1={size*0.15+6} y1={size*0.25+6} x2={size*0+6} y2={size*0.70+6} delay={1.3} />
-            <Connector x1={size*0.15+6} y1={size*0.25+6} x2={size*0.30+6} y2={size*0.70+6} delay={1.4} />
-            <Connector x1={size*0.85+6} y1={size*0.25+6} x2={size*0.70+6} y2={size*0.70+6} delay={1.5} />
-            <Connector x1={size*0.85+6} y1={size*0.25+6} x2={size*1+6} y2={size*0.70+6} delay={1.6} />
-            <Connector x1={size*0.30+6} y1={size*0.70+6} x2={size*0.5+6} y2={size*1+6} delay={1.7} />
-            <Connector x1={size*0.70+6} y1={size*0.70+6} x2={size*0.5+6} y2={size*1+6} delay={1.8} />
         </div>
     </div>
   );
