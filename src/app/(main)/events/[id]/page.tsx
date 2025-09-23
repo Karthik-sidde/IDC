@@ -100,7 +100,11 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   useEffect(() => {
     const foundEvent = getMockEvents().find((e) => e.id === params.id);
-    setEvent(foundEvent);
+    if (!foundEvent) {
+        notFound();
+    } else {
+        setEvent(foundEvent);
+    }
   }, [params.id]);
 
 
@@ -121,10 +125,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
 
   if (!event) {
-    const foundEvent = getMockEvents().find((e) => e.id === params.id);
-    if (!foundEvent) notFound();
-    setEvent(foundEvent);
-    return null; 
+    return null; // Or a loading spinner
   }
   
   const organizer = mockUsers.find((u) => u.id === event.organizerId);
