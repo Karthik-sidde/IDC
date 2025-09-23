@@ -24,12 +24,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { addMockEvent, mockSpeakers } from "@/lib/mock-data";
-import { type Event, type Speaker } from "@/lib/types";
+import { type Event, type Speaker, type Ticket } from "@/lib/types";
 import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "@/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert, Loader2, Wand2, Upload, Users, Check, ChevronsUpDown, Map } from "lucide-react";
+import { ShieldAlert, Loader2, Wand2, Upload, Users, Check, ChevronsUpDown, Map, PlusCircle, Trash2, Ticket as TicketIcon } from "lucide-react";
 import Image from "next/image";
 import {
   Popover,
@@ -47,6 +47,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ImageDropzone } from "@/components/ImageDropzone";
+import { Separator } from "@/components/ui/separator";
+
+type TicketTier = {
+    tier: string;
+    price: number;
+}
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -59,25 +65,13 @@ export default function NewEventPage() {
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
   const [venueDetails, setVenueDetails] = useState("Some place cool");
   const [googleMapsLink, setGoogleMapsLink] = useState("");
-  const [ticketTier, setTicketTier] = useState("General Admission");
-  const [ticketPrice, setTicketPrice] = useState(0);
+  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([{ tier: "General Admission", price: 10 }]);
   const [venueCapacity, setVenueCapacity] = useState(100);
-  const [eventType, setEventType] = useState<"free" | "paid">("paid");
   const [isPublishing, setIsPublishing] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedSpeakers, setSelectedSpeakers] = useState<Speaker[]>([]);
   
   const canCreateEvent = user?.role.includes('admin') || (user?.role === 'speaker' && user?.verificationStatus === 'approved');
-
-  useEffect(() => {
-    if (eventType === "free") {
-      setTicketPrice(0);
-    } else {
-      if (ticketPrice === 0) {
-        setTicketPrice(10);
-      }
-    }
-  }, [eventType, ticketPrice]);
   
   useEffect(() => {
     if (venueType === 'online') {
@@ -102,10 +96,38 @@ export default function NewEventPage() {
     }
   };
 
+  const handleAddTier = () => {
+    setTicketTiers([...ticketTiers, { tier: "", price: 0 }]);
+  };
+
+  const handleRemoveTier = (index: number) => {
+    const newTiers = ticketTiers.filter((_, i) => i !== index);
+    setTicketTiers(newTiers);
+  };
+
+  const handleTierChange = (index: number, field: 'tier' | 'price', value: string | number) => {
+    const newTiers = [...ticketTiers];
+    if (field === 'price') {
+      newTiers[index][field] = Number(value);
+    } else {
+      newTiers[index][field] = String(value);
+    }
+    setTicketTiers(newTiers);
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !canCreateEvent) return;
+    
+    if (ticketTiers.length === 0 || ticketTiers.some(t => !t.tier)) {
+        toast({
+            variant: "destructive",
+            title: "Validation Error",
+            description: "Please ensure all ticket tiers have a name.",
+        });
+        return;
+    }
 
     setIsPublishing(true);
     
@@ -131,12 +153,7 @@ export default function NewEventPage() {
         googleMapsLink: venueType === 'physical' ? googleMapsLink : undefined,
       },
       capacity: venueType === 'online' ? Infinity : venueCapacity,
-      tickets: [
-        {
-          tier: ticketTier,
-          price: eventType === 'free' ? 0 : Number(ticketPrice),
-        },
-      ],
+      tickets: ticketTiers,
       organizerId: user.id,
       coverImage: finalCoverImage,
       speakers: selectedSpeakers,
@@ -327,30 +344,47 @@ export default function NewEventPage() {
 
       <Card className="glass">
         <CardHeader>
-          <CardTitle>Venue & Ticketing</CardTitle>
+          <CardTitle>Venue</CardTitle>
           <CardDescription>
-            Specify where the event will take place and ticket details.
+            Specify where the event will take place.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-              <Label>Venue Type</Label>
-               <RadioGroup
-                defaultValue={venueType}
-                onValueChange={(value) => setVenueType(value as "physical" | "online")}
-                className="grid grid-cols-2 gap-4"
-                disabled={isPublishing}
-              >
-                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                  <RadioGroupItem value="physical" id="r-physical" />
-                  <span>Physical</span>
-                </Label>
-                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                  <RadioGroupItem value="online" id="r-online" />
-                  <span>Online</span>
-                </Label>
-              </RadioGroup>
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                    <Label>Venue Type</Label>
+                    <RadioGroup
+                        defaultValue={venueType}
+                        onValueChange={(value) => setVenueType(value as "physical" | "online")}
+                        className="grid grid-cols-2 gap-4"
+                        disabled={isPublishing}
+                    >
+                        <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="physical" id="r-physical" />
+                        <span>Physical</span>
+                        </Label>
+                        <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="online" id="r-online" />
+                        <span>Online</span>
+                        </Label>
+                    </RadioGroup>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="venue-capacity">Venue Capacity</Label>
+                    <Input
+                        id="venue-capacity"
+                        type="number"
+                        placeholder="e.g., 500"
+                        value={isFinite(venueCapacity) ? venueCapacity : ''}
+                        onChange={(e) => setVenueCapacity(Number(e.target.value))}
+                        required
+                        disabled={isPublishing || venueType === 'online'}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        {venueType === 'online' ? 'Online events have unlimited capacity.' : 'Total number of attendees allowed.'}
+                    </p>
+                </div>
+            </div>
           
            <div className="space-y-2">
               <Label htmlFor="venue-details">Venue Details</Label>
@@ -383,65 +417,78 @@ export default function NewEventPage() {
                     </p>
                 </div>
             )}
-          
-           <div className="space-y-2">
-              <Label>Event Type</Label>
-              <RadioGroup
-                defaultValue={eventType}
-                onValueChange={(value) => setEventType(value as 'free' | 'paid')}
-                className="grid grid-cols-2 gap-4"
-                disabled={isPublishing}
-              >
-                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                  <RadioGroupItem value="paid" id="r-paid" />
-                  <span>Paid</span>
-                </Label>
-                 <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                  <RadioGroupItem value="free" id="r-free" />
-                  <span>Free</span>
-                </Label>
-              </RadioGroup>
-            </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="ticket-tier">Ticket Tier</Label>
-              <Input
-                id="ticket-tier"
-                placeholder="e.g., General Admission"
-                value={ticketTier}
-                onChange={(e) => setTicketTier(e.target.value)}
-                defaultValue="General Admission"
-                disabled={isPublishing}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ticket-price">Price (₹)</Label>
-              <Input
-                id="ticket-price"
-                type="number"
-                placeholder="e.g., 25"
-                value={ticketPrice}
-                onChange={(e) => setTicketPrice(Number(e.target.value))}
-                disabled={eventType === "free" || isPublishing}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="venue-capacity">Venue Capacity</Label>
-              <Input
-                id="venue-capacity"
-                type="number"
-                placeholder="e.g., 500"
-                value={isFinite(venueCapacity) ? venueCapacity : ''}
-                onChange={(e) => setVenueCapacity(Number(e.target.value))}
-                required
-                disabled={isPublishing || venueType === 'online'}
-              />
-            </div>
-          </div>
         </CardContent>
       </Card>
+      
+      <Card className="glass">
+        <CardHeader>
+            <div className="flex justify-between items-center">
+                <div>
+                    <CardTitle>Ticketing</CardTitle>
+                    <CardDescription>
+                        Create different ticket tiers for your event. Set price to 0 for free tickets.
+                    </CardDescription>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddTier} disabled={isPublishing}>
+                    <PlusCircle />
+                    Add Tier
+                </Button>
+            </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+            {ticketTiers.length === 0 ? (
+                <div className="text-center text-muted-foreground border-2 border-dashed rounded-lg p-8">
+                    <TicketIcon className="mx-auto h-12 w-12" />
+                    <p className="mt-4 font-semibold">No ticket tiers created.</p>
+                    <p className="text-sm">Click "Add Tier" to create your first ticket.</p>
+                </div>
+            ) : (
+                ticketTiers.map((tier, index) => (
+                    <div key={index} className="p-4 border rounded-lg bg-muted/20">
+                         <div className="flex justify-between items-start gap-4">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor={`tier-name-${index}`}>Tier Name</Label>
+                                    <Input
+                                        id={`tier-name-${index}`}
+                                        placeholder="e.g., General Admission"
+                                        value={tier.tier}
+                                        onChange={(e) => handleTierChange(index, 'tier', e.target.value)}
+                                        disabled={isPublishing}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`tier-price-${index}`}>Price (₹)</Label>
+                                    <Input
+                                        id={`tier-price-${index}`}
+                                        type="number"
+                                        placeholder="e.g., 25"
+                                        value={tier.price}
+                                        min={0}
+                                        onChange={(e) => handleTierChange(index, 'price', e.target.value)}
+                                        disabled={isPublishing}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleRemoveTier(index)} 
+                                disabled={isPublishing || ticketTiers.length <= 1}
+                                className="mt-7 text-muted-foreground hover:text-destructive"
+                            >
+                                <Trash2 className="h-4 w-4"/>
+                            </Button>
+                         </div>
+                    </div>
+                ))
+            )}
+        </CardContent>
+      </Card>
+
 
       <div className="flex justify-end gap-2">
         <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPublishing}>Cancel</Button>
@@ -453,3 +500,5 @@ export default function NewEventPage() {
     </form>
   );
 }
+
+    
