@@ -37,6 +37,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from 'framer-motion';
 
 type ScanResult = {
   status: "success" | "already_scanned" | "invalid";
@@ -46,6 +47,28 @@ type ScanResult = {
 
 // Store scanned ticket IDs in memory for the session
 const scannedTickets = new Set<string>();
+
+const ScannerOverlay = ({ isScanning }: { isScanning: boolean }) => (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="relative w-2/3 max-w-sm aspect-square">
+            {/* Corner brackets */}
+            <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-white/80 rounded-tl-lg"></div>
+            <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-white/80 rounded-tr-lg"></div>
+            <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-white/80 rounded-bl-lg"></div>
+            <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-white/80 rounded-br-lg"></div>
+            
+            {isScanning && (
+                 <motion.div
+                    className="absolute w-full h-1 bg-primary/70 rounded-full shadow-[0_0_10px_theme(colors.primary)]"
+                    initial={{ y: 0 }}
+                    animate={{ y: ['5%', '95%', '5%'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                />
+            )}
+        </div>
+    </div>
+);
+
 
 export default function QRScannerPage() {
   const [isScanning, setIsScanning] = useState(false);
@@ -178,22 +201,46 @@ export default function QRScannerPage() {
         </div>
         <Card className="glass">
           <CardContent className="p-6">
-            <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-              {!isScanning && !scanResult && (
-                <div className="text-center text-muted-foreground">
-                  <Camera className="mx-auto h-16 w-16" />
-                  <p className="mt-2">Click "Start Scanning" to open camera</p>
-                </div>
-              )}
+            <div className={cn("relative aspect-video w-full rounded-lg bg-muted flex items-center justify-center overflow-hidden transition-all", isScanning && "ring-2 ring-primary glow")}>
+                <AnimatePresence>
+                    {!isScanning && !scanResult && (
+                        <motion.div 
+                          className="text-center text-muted-foreground"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          >
+                           <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
+                             <ScannerOverlay isScanning={false} />
+                             <QrCode className="w-20 h-20 text-muted-foreground/50"/>
+                           </div>
+                           <p className="mt-2 font-semibold">Ready to Scan</p>
+                           <p className="text-sm">Click the button below to start the camera.</p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
               <video
                 ref={videoRef}
-                className={cn("w-full h-full object-cover", !isScanning && "hidden")}
+                className={cn("w-full h-full object-cover transition-opacity", !isScanning ? "opacity-0" : "opacity-100")}
                 autoPlay
                 muted
                 playsInline
               />
               <canvas ref={canvasRef} style={{ display: 'none' }} />
+              
+              <AnimatePresence>
+                {isScanning && (
+                   <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <ScannerOverlay isScanning={isScanning} />
+                    </motion.div>
+                )}
+              </AnimatePresence>
 
               {isScanning && hasCameraPermission === false && (
                 <Alert variant="destructive" className="m-4">
@@ -282,3 +329,5 @@ export default function QRScannerPage() {
     </>
   );
 }
+
+    
