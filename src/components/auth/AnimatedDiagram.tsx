@@ -52,8 +52,8 @@ const Node = ({
     style={{
       left: x,
       top: y,
-      width: isNucleus ? 16 : 12,
-      height: isNucleus ? 16 : 12,
+      width: 12,
+      height: 12,
       boxShadow: "0 0 12px 1px hsl(var(--primary) / 0.7)",
     }}
     initial={{ scale: 0, opacity: 0 }}
@@ -97,28 +97,19 @@ export const AnimatedDiagram = () => {
         and accelerate your career in the data industry.
       </motion.p>
       <div className="relative mt-8 h-80 w-80">
-
-        {/* System 1 */}
+        {/* Body 1 */}
         <Orbit radius={80} duration={12}>
           <Node x="0%" y="50%" delay={0.5} />
-          <Orbit radius={30} duration={8}>
-             <Node x="0%" y="50%" delay={0.6}/>
-          </Orbit>
         </Orbit>
 
-        {/* System 2 */}
-        <Orbit radius={120} duration={20}>
-          <Node x="20%" y="20%" delay={0.7} />
+        {/* Body 2 */}
+        <Orbit radius={120} duration={18}>
+          <Node x="20%" y="20%" delay={0.6} />
         </Orbit>
 
-        {/* System 3 - a faster, smaller orbit */}
-         <Orbit radius={50} duration={7} delay={1}>
-            <Node x="10%" y="50%" delay={0.8} />
-        </Orbit>
-
-        {/* A large, slow outer body */}
-        <Orbit radius={150} duration={30}>
-            <Node x="50%" y="0%" delay={0.9} />
+        {/* Body 3 */}
+         <Orbit radius={150} duration={25}>
+            <Node x="100%" y="50%" delay={0.7} />
         </Orbit>
 
       </div>
