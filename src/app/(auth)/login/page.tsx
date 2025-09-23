@@ -1,9 +1,18 @@
 
 "use client";
 
-import { useState, useContext } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { AtSign, KeyRound, Loader2, LogIn, UserPlus, User, Mic } from "lucide-react";
+import { useState, useContext, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  AtSign,
+  KeyRound,
+  Loader2,
+  LogIn,
+  UserPlus,
+  User,
+  Mic,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,26 +33,70 @@ import { addMockUser, mockUsers } from "@/lib/mock-data";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number");
+
+const registerSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+    role: z.enum(["user", "speaker"]),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" {...props}>
-        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
-        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
-        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C44.57,34.933,48,29.898,48,24C48,22.659,47.862,21.35,47.611,20.083z" />
-    </svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 48 48"
+    width="24px"
+    height="24px"
+    {...props}
+  >
+    <path
+      fill="#FFC107"
+      d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+    />
+    <path
+      fill="#FF3D00"
+      d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+    />
+    <path
+      fill="#4CAF50"
+      d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+    />
+    <path
+      fill="#1976D2"
+      d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C44.57,34.933,48,29.898,48,24C48,22.659,47.862,21.35,47.611,20.083z"
+    />
+  </svg>
 );
-  
+
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    {...props}
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
 );
 
 const CodebasicsIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -53,69 +106,97 @@ const CodebasicsIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 
+const FormField = ({ name, label, icon, placeholder, type = "text", register, errors, isDirty, isValid }: any) => {
+    const hasError = !!errors[name];
+    const showTick = isDirty && isValid && !hasError;
+    return (
+        <div className="space-y-2">
+            <Label htmlFor={name}>{label}</Label>
+            <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground">{icon}</div>
+                <Input
+                    id={name}
+                    type={type}
+                    placeholder={placeholder}
+                    {...register(name)}
+                    className={cn("pl-10", hasError && "border-destructive focus-visible:ring-destructive", showTick && "border-green-500")}
+                />
+                <AnimatePresence>
+                    {showTick && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center"
+                        >
+                            <Check className="h-3 w-3" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+            {errors[name] && <p className="text-sm text-destructive">{errors[name]?.message}</p>}
+        </div>
+    )
+}
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<UserRole>("user");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [email, setEmail] = useState("alex.doe@example.com");
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
   const { login } = useContext(UserContext);
   const { toast } = useToast();
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, touchedFields, dirtyFields, isValid },
+    watch,
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    mode: "onChange",
+    defaultValues: {
+      role: "user",
+    },
+  });
+
+  const [isRegisterLoading, setIsRegisterLoading] = useState(false);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsLoginLoading(true);
 
     setTimeout(() => {
-      const userToLogin = mockUsers.find(u => u.email === email);
-      if (userToLogin && !userToLogin.emailVerified) {
-          toast({
-            variant: "destructive",
-            title: "Email Not Verified",
-            description: "Please verify your email before logging in.",
-          });
-          router.push(`/verify-email?email=${email}`);
-          setIsLoading(false);
-          return;
-      }
-
       login(email);
-      setIsLoading(false);
-      
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
-      sessionStorage.removeItem('redirectAfterLogin');
+      setIsLoginLoading(false);
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/events";
+      sessionStorage.removeItem("redirectAfterLogin");
       router.push(redirectPath);
     }, 1000);
   };
-  
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const existingUser = mockUsers.find(u => u.email === email);
+  const handleRegister = (data: RegisterFormValues) => {
+    const existingUser = mockUsers.find((u) => u.email === data.email);
     if (existingUser) {
-        toast({
-            variant: "destructive",
-            title: "User Exists",
-            description: "A user with this email already exists. Please sign in.",
-        });
-        return;
+      toast({
+        variant: "destructive",
+        title: "User Exists",
+        description: "A user with this email already exists. Please sign in.",
+      });
+      return;
     }
 
-    setIsLoading(true);
-    setIsRegistering(true);
-    
+    setIsRegisterLoading(true);
+
     setTimeout(() => {
-      const newUser = {
+      const newUser: User = {
         id: `user-${Date.now()}`,
-        name,
-        email,
-        role,
-        status: "active" as const,
-        emailVerified: false,
-        verificationStatus: role === 'speaker' ? 'pending' as const : undefined,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        status: "active",
+        emailVerified: true, // Bypassing email verification for now
+        verificationStatus: data.role === "speaker" ? ("pending" as const) : undefined,
         profile: {
           avatar: `https://picsum.photos/seed/${Date.now()}/100/100`,
           bio: "",
@@ -123,24 +204,29 @@ export default function LoginPage() {
       };
       addMockUser(newUser);
 
-      setIsLoading(false);
-      setIsRegistering(false);
+      // Log in the new user directly
+      login(newUser.email, newUser.role);
       
-      router.push(`/verify-email?email=${email}`);
-      toast({
-        title: "Registration Successful!",
-        description: "Please check your email to verify your account.",
-      });
+      setIsRegisterLoading(false);
+      
+      // Redirect to profile setup
+      router.push('/profile-setup');
 
-    }, 1000);
+      toast({
+        title: "Account Created!",
+        description: "Welcome! Let's set up your profile.",
+      });
+    }, 1500);
   };
+  
+    const passwordValue = watch("password");
 
 
   return (
     <Card className="w-full max-w-sm glass">
       <Tabs defaultValue="login" className="w-full">
         <CardHeader>
-           <div className="mx-auto mb-4">
+          <div className="mx-auto mb-4">
             <AppLogo />
           </div>
           <TabsList className="grid w-full grid-cols-2">
@@ -151,7 +237,7 @@ export default function LoginPage() {
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
-               <CardDescription className="text-center">
+              <CardDescription className="text-center">
                 Sign in to your account to continue.
               </CardDescription>
               <div className="space-y-2">
@@ -187,114 +273,132 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full hover:glow"
-                disabled={isLoading}
+                disabled={isLoginLoading}
               >
-                {isLoading && !isRegistering ? <Loader2 className="animate-spin" /> : <LogIn />}
+                {isLoginLoading ? <Loader2 className="animate-spin" /> : <LogIn />}
                 <span>Sign In</span>
               </Button>
               <p className="text-xs text-muted-foreground">
-                Are you an admin? <Link href="/admin/login" className="text-primary underline">Login here</Link>
+                Are you an admin?{" "}
+                <Link href="/admin/login" className="text-primary underline">
+                  Login here
+                </Link>
               </p>
             </CardFooter>
           </form>
         </TabsContent>
         <TabsContent value="register">
-           <form onSubmit={handleRegister}>
+          <form onSubmit={handleSubmit(handleRegister)}>
             <CardContent className="space-y-4">
-               <CardDescription className="text-center">
+              <CardDescription className="text-center">
                 Create a new account.
               </CardDescription>
-              
+
               <div className="space-y-3">
-                  <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
-                    <CodebasicsIcon className="mr-2 h-5 w-5" />
-                    Continue with Codebasics
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <GoogleIcon className="mr-2 h-5 w-5" />
-                    Continue with Google
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <XIcon className="mr-2 h-5 w-5" />
-                    Continue with X
-                  </Button>
+                <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
+                  <CodebasicsIcon className="mr-2 h-5 w-5" />
+                  Continue with Codebasics
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <GoogleIcon className="mr-2 h-5 w-5" />
+                  Continue with Google
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <XIcon className="mr-2 h-5 w-5" />
+                  Continue with X
+                </Button>
               </div>
 
-               <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <Separator className="flex-1" />
                 <span className="text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1" />
               </div>
 
-
               <div className="space-y-2">
                 <Label>I want to sign up as a...</Label>
-                <RadioGroup
-                    defaultValue={role}
-                    onValueChange={(value) => setRole(value as UserRole)}
-                    className="grid grid-cols-2 gap-4"
-                >
-                    <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                        <RadioGroupItem value="user" id="r-user" className="sr-only"/>
-                        <User className="mb-3 h-6 w-6" />
-                        Attendee
-                    </Label>
-                    <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                        <RadioGroupItem value="speaker" id="r-speaker" className="sr-only"/>
-                        <Mic className="mb-3 h-6 w-6" />
-                        Speaker
-                    </Label>
-                </RadioGroup>
+                 <Controller
+                    name="role"
+                    control={control}
+                    render={({ field }) => (
+                        <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="grid grid-cols-2 gap-4"
+                        >
+                            <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                <RadioGroupItem value="user" id="r-user" className="sr-only"/>
+                                <User className="mb-3 h-6 w-6" />
+                                Attendee
+                            </Label>
+                            <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                <RadioGroupItem value="speaker" id="r-speaker" className="sr-only"/>
+                                <Mic className="mb-3 h-6 w-6" />
+                                Speaker
+                            </Label>
+                        </RadioGroup>
+                    )}
+                />
               </div>
 
-                <div className="space-y-2">
-                <Label htmlFor="register-name">Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="register-name"
-                    type="text"
+               <FormField 
+                    name="name"
+                    label="Name"
+                    icon={<User />}
                     placeholder="State your name"
-                    required
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="register-email">Email</Label>
-                <div className="relative">
-                  <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="register-email"
-                    type="email"
+                    register={register}
+                    errors={errors}
+                    isDirty={dirtyFields.name}
+                    isValid={!errors.name}
+                />
+
+                <FormField 
+                    name="email"
+                    label="Email"
+                    icon={<AtSign />}
                     placeholder="yourname@gmail.com"
-                    required
-                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="register-password">Password</Label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="register-password"
+                    register={register}
+                    errors={errors}
+                    isDirty={dirtyFields.email}
+                    isValid={!errors.email}
+                />
+
+                <FormField 
+                    name="password"
+                    label="Password"
+                    icon={<KeyRound />}
+                    placeholder="Min. 8 characters"
                     type="password"
-                    required
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+                    register={register}
+                    errors={errors}
+                    isDirty={dirtyFields.password}
+                    isValid={!errors.password && passwordValue?.length > 0}
+                />
+                
+                 <FormField 
+                    name="confirmPassword"
+                    label="Re-enter Password"
+                    icon={<KeyRound />}
+                    placeholder="Confirm your password"
+                    type="password"
+                    register={register}
+                    errors={errors}
+                    isDirty={dirtyFields.confirmPassword}
+                    isValid={!errors.confirmPassword && watch("confirmPassword") === passwordValue}
+                />
+
             </CardContent>
             <CardFooter>
-                <Button
+              <Button
                 type="submit"
-                className="w-full hover:glow"
-                disabled={isLoading}
+                className="w-full hover:glow transition-all duration-300"
+                disabled={isRegisterLoading || !isValid}
               >
-                {isLoading && isRegistering ? <Loader2 className="animate-spin" /> : <UserPlus />}
+                {isRegisterLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <UserPlus />
+                )}
                 <span>Create Account</span>
               </Button>
             </CardFooter>

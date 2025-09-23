@@ -1,3 +1,4 @@
+
 export type UserRole = "super_admin" | "admin" | "user" | "speaker";
 
 export interface User {
@@ -13,6 +14,7 @@ export interface User {
     bio: string;
     xUrl?: string;
     linkedinUrl?: string;
+    isComplete?: boolean;
   };
 }
 

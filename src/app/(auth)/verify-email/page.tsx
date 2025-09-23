@@ -31,13 +31,21 @@ function VerifyEmailContent() {
     setIsLoading(true);
     // Simulate API call to verify email
     setTimeout(() => {
-      verifyUserEmail(email);
+      const isVerified = verifyUserEmail(email);
       setIsLoading(false);
-      toast({
-        title: "Email Verified!",
-        description: "Your email has been successfully verified. You can now log in.",
-      });
-      router.push("/login");
+      if (isVerified) {
+        toast({
+            title: "Email Verified!",
+            description: "Your email has been successfully verified. You can now log in.",
+        });
+        router.push("/login");
+      } else {
+         toast({
+            variant: "destructive",
+            title: "Verification Failed",
+            description: "Could not find a user with that email.",
+        });
+      }
     }, 1500);
   };
 
@@ -59,7 +67,7 @@ function VerifyEmailContent() {
         <Button
           className="w-full hover:glow"
           onClick={handleVerification}
-          disabled={isLoading}
+          disabled={isLoading || !email}
         >
           {isLoading ? (
             <>

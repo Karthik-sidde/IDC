@@ -1,3 +1,4 @@
+
 import type { User, Event, Ticket } from "./types";
 import { subDays, addDays } from "date-fns";
 
@@ -13,7 +14,8 @@ export let mockUsers: User[] = [
       avatar: "https://picsum.photos/seed/avatar1/100/100",
       bio: "Tech enthusiast and event lover.",
       xUrl: "https://x.com/alexdoe",
-      linkedinUrl: "https://linkedin.com/in/alexdoe"
+      linkedinUrl: "https://linkedin.com/in/alexdoe",
+      isComplete: true,
     },
   },
   {
@@ -26,6 +28,7 @@ export let mockUsers: User[] = [
     profile: {
       avatar: "https://picsum.photos/seed/avatar2/100/100",
       bio: "Event organizer for tech conferences.",
+      isComplete: true,
     },
   },
   {
@@ -38,6 +41,7 @@ export let mockUsers: User[] = [
     profile: {
       avatar: "https://picsum.photos/seed/avatar3/100/100",
       bio: "Platform administrator.",
+      isComplete: true,
     },
   },
   {
@@ -51,6 +55,7 @@ export let mockUsers: User[] = [
     profile: {
       avatar: "https://picsum.photos/seed/avatar4/100/100",
       bio: "Expert in decentralized systems and blockchain technology.",
+      isComplete: true,
     },
   },
     {
@@ -64,6 +69,7 @@ export let mockUsers: User[] = [
     profile: {
       avatar: "https://picsum.photos/seed/avatar5/100/100",
       bio: "Works on sustainable energy and space exploration.",
+      isComplete: true,
     },
   },
 ];
@@ -202,7 +208,15 @@ export const addMockUser = (user: User) => {
 }
 
 export const verifyUserEmail = (email: string) => {
-    mockUsers = mockUsers.map(u => u.email === email ? { ...u, emailVerified: true } : u);
+    let found = false;
+    mockUsers = mockUsers.map(u => {
+        if (u.email === email) {
+            found = true;
+            return { ...u, emailVerified: true };
+        }
+        return u;
+    });
+    return found;
 }
 
 // Also export the raw data for cases where we don't want to use the functions

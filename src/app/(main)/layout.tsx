@@ -30,7 +30,8 @@ import {
   Shield,
   LogIn,
   Mic,
-  FileCheck
+  FileCheck,
+  AlertCircle,
 } from "lucide-react";
 import { useContext } from "react";
 import { UserContext } from "@/context/UserContext";
@@ -47,6 +48,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     logout();
     router.push("/");
   };
+  
+  const showProfileCompletionReminder = user && !user.profile.isComplete;
+
 
   const menuItems = [
     {
@@ -130,10 +134,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   
   const getPageTitle = () => {
     if (pathname === '/') return 'Home';
+    // Special case for profile setup
+    if (pathname === '/profile-setup') return 'Create Your Profile';
+
     const allMenus = [...userMenu, ...hostingMenu, ...adminMenu, ...superAdminMenu];
-    const
- 
-activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !== '/');
+    const activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !== '/');
     return activeItem?.label || "Events";
   }
 
@@ -145,6 +150,16 @@ activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !
           <AppLogo />
         </SidebarHeader>
         <SidebarContent>
+           {showProfileCompletionReminder && (
+             <SidebarGroup>
+                <div className="p-2 bg-yellow-100/10 border border-yellow-500/30 rounded-lg text-center mx-2">
+                    <AlertCircle className="h-6 w-6 text-yellow-500 mx-auto mb-2"/>
+                    <p className="text-xs text-yellow-300 mb-2">Complete your profile to get the full experience!</p>
+                    <Button size="sm" className="h-7 text-xs" onClick={() => router.push('/profile-setup')}>Complete Profile</Button>
+                </div>
+             </SidebarGroup>
+          )}
+
           <SidebarGroup>
             <SidebarMenu>
               {userMenu.map((item) => (

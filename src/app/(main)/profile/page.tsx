@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Linkedin, UserCircle, Save } from "lucide-react";
+import { Linkedin, UserCircle, Save, Upload } from "lucide-react";
 import { type User } from "@/lib/types";
 
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -32,13 +32,13 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function ProfilePage() {
-  const { user, setUser } = useContext(UserContext); // Assuming setUser is available for local state update
+  const { user, setUser } = useContext(UserContext);
   const { toast } = useToast();
   const [profile, setProfile] = useState<User | null>(null);
 
   useEffect(() => {
     if (user) {
-      setProfile(user);
+      setProfile(JSON.parse(JSON.stringify(user))); // Deep copy
     }
   }, [user]);
 
@@ -47,25 +47,39 @@ export default function ProfilePage() {
   ) => {
     if (profile) {
       const { id, value } = e.target;
-      if (id === 'bio') {
-        setProfile({ ...profile, profile: { ...profile.profile, bio: value } });
-      } else if (id === 'xUrl' || id === 'linkedinUrl') {
-         setProfile({ ...profile, profile: { ...profile.profile, [id]: value } });
-      }
-      else {
-        setProfile({ ...profile, [id]: value });
+      // Handle nested profile properties
+      if (['bio', 'xUrl', 'linkedinUrl'].includes(id)) {
+        setProfile(prev => prev ? { ...prev, profile: { ...prev.profile, [id]: value } } : null);
+      } else {
+        setProfile(prev => prev ? { ...prev, [id]: value } : null);
       }
     }
   };
+  
+  const handleAvatarChange = () => {
+    // In a real app, this would open a file dialog
+    toast({
+        title: "Feature not implemented",
+        description: "Avatar uploads will be available soon.",
+    });
+    if (profile) {
+      const newAvatar = `https://picsum.photos/seed/${Date.now()}/100/100`;
+      setProfile({ ...profile, profile: { ...profile.profile, avatar: newAvatar } });
+    }
+  }
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (profile) {
-      // In a real app, you would call an API to update the user
-      // For this mock, we update context if setUser is provided
-      if (setUser) {
-        setUser(profile);
-      }
+      const updatedUser = {
+          ...profile,
+          profile: {
+              ...profile.profile,
+              isComplete: true, // Mark as complete on save
+          }
+      };
+      setUser(updatedUser);
       toast({
         title: "Profile Updated",
         description: "Your profile information has been successfully saved.",
@@ -103,7 +117,8 @@ export default function ProfilePage() {
                 <AvatarImage src={profile.profile.avatar} />
                 <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" onClick={handleAvatarChange}>
+                 <Upload className="mr-2 h-4 w-4"/>
                 Change Photo
               </Button>
             </div>
