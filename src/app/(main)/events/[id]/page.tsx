@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Image from 'next/image';
@@ -17,6 +18,7 @@ import {
   Video,
   CreditCard,
   CheckCircle2,
+  Linkedin,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -34,8 +36,55 @@ import {
 import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/context/UserContext';
-import { type Ticket as TicketType, type Event, type User } from '@/lib/types';
+import { type Ticket as TicketType, type Event, type User, type Speaker } from '@/lib/types';
 import { LoginDialog } from '@/components/auth/LoginDialog';
+import Link from 'next/link';
+
+const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+
+
+const SpeakerCard = ({ speaker }: { speaker: Speaker }) => (
+    <Card className="glass">
+        <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+                <Avatar className="h-24 w-24 border-2 border-primary">
+                    <AvatarImage src={speaker.avatar} alt={speaker.name} />
+                    <AvatarFallback>{speaker.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-xl font-bold font-headline">{speaker.name}</h3>
+                    <p className="text-primary font-medium">{speaker.title}</p>
+                    <div className="flex justify-center sm:justify-start gap-3 mt-2">
+                        {speaker.social.x && (
+                            <Link href={speaker.social.x} target="_blank" rel="noreferrer">
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <XIcon className="h-4 w-4" />
+                                </Button>
+                            </Link>
+                        )}
+                        {speaker.social.linkedin && (
+                            <Link href={speaker.social.linkedin} target="_blank" rel="noreferrer">
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Linkedin className="h-4 w-4" />
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{speaker.bio}</p>
+        </CardContent>
+    </Card>
+);
 
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
@@ -146,6 +195,8 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const MAX_DISPLAY_ATTENDEES = 7;
   const remainingAttendees = attendees.length > MAX_DISPLAY_ATTENDEES ? attendees.length - MAX_DISPLAY_ATTENDEES : 0;
 
+  const defaultTab = event.speakers.length > 0 ? "speakers" : "overview";
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -173,21 +224,21 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {/* Main Content */}
         <div className="md:col-span-2">
-            <Tabs defaultValue="overview">
+            <Tabs defaultValue={defaultTab}>
                 <TabsList className='w-full'>
-                    <TabsTrigger value="overview" className='flex-1'>Overview</TabsTrigger>
-                    <TabsTrigger value="schedule" className='flex-1'>Schedule</TabsTrigger>
-                    <TabsTrigger value="speakers" className='flex-1'>Speakers</TabsTrigger>
+                    <TabsTrigger value="overview" className='flex-1'>About</TabsTrigger>
+                    {event.speakers.length > 0 && <TabsTrigger value="speakers" className='flex-1'>Speakers</TabsTrigger>}
                     <TabsTrigger value="attendees" className='flex-1'>Attendees ({attendees.length})</TabsTrigger>
                 </TabsList>
-                <TabsContent value="overview" className='mt-6 text-foreground/90'>
+                <TabsContent value="overview" className='mt-6 text-foreground/90 prose dark:prose-invert max-w-none'>
                     <p className='whitespace-pre-wrap leading-relaxed'>{event.description}</p>
                 </TabsContent>
-                 <TabsContent value="schedule" className='mt-6'>
-                    <p>Event schedule will be displayed here.</p>
-                </TabsContent>
-                 <TabsContent value="speakers" className='mt-6'>
-                    <p>Speaker information will be displayed here.</p>
+                 <TabsContent value="speakers" className='mt-6 space-y-6'>
+                    {event.speakers.length > 0 ? (
+                        event.speakers.map(speaker => <SpeakerCard key={speaker.id} speaker={speaker} />)
+                    ) : (
+                        <p className="text-muted-foreground text-center py-4">Speaker information will be announced soon.</p>
+                    )}
                 </TabsContent>
                 <TabsContent value="attendees" className='mt-6'>
                     {attendees.length > 0 ? (

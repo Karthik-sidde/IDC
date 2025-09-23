@@ -1,5 +1,6 @@
 
-import type { User, Event, Ticket } from "./types";
+
+import type { User, Event, Ticket, Speaker } from "./types";
 import { subDays, addDays } from "date-fns";
 
 export let mockUsers: User[] = [
@@ -74,11 +75,48 @@ export let mockUsers: User[] = [
   },
 ];
 
+const mockSpeakers: Speaker[] = [
+    {
+        id: "spk-1",
+        name: "Satya Nadella",
+        title: "CEO of Microsoft",
+        avatar: "https://picsum.photos/seed/spk1/100/100",
+        bio: "Satya Nadella is a business executive who is the executive chairman and CEO of Microsoft. He is a leading voice in the technology industry, focusing on cloud computing, AI, and digital transformation. He will be discussing the future of AI and its impact on modern businesses.",
+        social: {
+            x: "https://x.com/satyanadella",
+            linkedin: "https://linkedin.com/in/satyanadella"
+        }
+    },
+    {
+        id: "spk-2",
+        name: "Vitalik Buterin",
+        title: "Co-founder of Ethereum",
+        avatar: "https://picsum.photos/seed/spk2/100/100",
+        bio: "Vitalik Buterin is a programmer and writer primarily known as one of the co-founders of Ethereum. He will be giving a keynote on the evolution of decentralized finance (DeFi) and the next generation of blockchain protocols.",
+        social: {
+            x: "https://x.com/VitalikButerin",
+            linkedin: "https://linkedin.com/in/vitalik-buterin-267a81a5"
+        }
+    },
+    {
+        id: "spk-3",
+        name: "Dr. Fei-Fei Li",
+        title: "Professor at Stanford University",
+        avatar: "https://picsum.photos/seed/spk3/100/100",
+        bio: "Dr. Fei-Fei Li is a leading AI researcher, known for her work on computer vision and AI ethics. She is the co-director of Stanford's Human-Centered AI Institute. Her talk will cover the importance of human-centric AI and its ethical implications.",
+        social: {
+            x: "https://x.com/drfeifei",
+            linkedin: "https://linkedin.com/in/fei-fei-li-4541247"
+        }
+    }
+]
+
+
 const mockEvents: Event[] = [
   {
     id: "event-1",
     title: "Future of Web3 Summit",
-    description: "An immersive conference exploring the future of decentralized technologies, blockchain, and Web3. Join industry leaders for keynotes, workshops, and networking.",
+    description: "An immersive conference exploring the future of decentralized technologies, blockchain, and Web3. This summit brings together the brightest minds and leading voices in the decentralized space. Attendees will have the opportunity to participate in hands-on workshops, listen to visionary keynotes from industry pioneers, and network with a global community of developers, investors, and enthusiasts. Whether you're a seasoned expert or new to the world of Web3, this event will provide valuable insights and connections to help you navigate the next wave of the internet.",
     category: "Tech",
     date: addDays(new Date(), 15),
     venue: {
@@ -88,6 +126,7 @@ const mockEvents: Event[] = [
     tickets: [{ tier: "General Admission", price: 199, quantity: 500 }],
     organizerId: "speaker-2",
     coverImage: "https://picsum.photos/seed/event1/600/400",
+    speakers: [mockSpeakers[1], mockSpeakers[0]]
   },
   {
     id: "event-2",
@@ -105,6 +144,7 @@ const mockEvents: Event[] = [
     ],
     organizerId: "admin-1",
     coverImage: "https://picsum.photos/seed/event2/600/400",
+    speakers: [],
   },
   {
     id: "event-3",
@@ -119,6 +159,7 @@ const mockEvents: Event[] = [
     tickets: [{ tier: "Free Entry", price: 0, quantity: 200 }],
     organizerId: "admin-1",
     coverImage: "https://picsum.photos/seed/event3/600/400",
+    speakers: [],
   },
   {
     id: "event-4",
@@ -133,6 +174,7 @@ const mockEvents: Event[] = [
     tickets: [{ tier: "Online Access", price: 25, quantity: 1000 }],
     organizerId: "speaker-2",
     coverImage: "https://picsum.photos/seed/event4/600/400",
+    speakers: [mockSpeakers[2]],
   },
   {
     id: "event-5",
@@ -147,6 +189,7 @@ const mockEvents: Event[] = [
     tickets: [{ tier: "Workshop Fee", price: 50, quantity: 50 }],
     organizerId: "admin-1",
     coverImage: "https://picsum.photos/seed/event5/600/400",
+    speakers: [],
   },
   {
     id: "event-6",
@@ -161,6 +204,7 @@ const mockEvents: Event[] = [
     tickets: [{ tier: "Entry", price: 10, quantity: 5000 }],
     organizerId: "admin-1",
     coverImage: "https://picsum.photos/seed/event6/600/400",
+    speakers: [],
   },
 ];
 

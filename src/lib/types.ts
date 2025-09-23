@@ -1,4 +1,5 @@
 
+
 export type UserRole = "super_admin" | "admin" | "user" | "speaker";
 
 export interface User {
@@ -18,8 +19,20 @@ export interface User {
   };
 }
 
-export interface Event {
+export interface Speaker {
   id: string;
+  name: string;
+  title: string;
+  avatar: string;
+  bio: string;
+  social: {
+    x?: string;
+    linkedin?: string;
+  };
+}
+
+export interface Event {
+  id:string;
   title: string;
   description: string;
   category: string;
@@ -35,6 +48,7 @@ export interface Event {
   }[];
   organizerId: string;
   coverImage: string;
+  speakers: Speaker[];
 }
 
 export interface Ticket {
