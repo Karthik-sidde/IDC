@@ -28,7 +28,7 @@ const Orbit = ({
     animate={{ rotate: 360 }}
     transition={{
       duration,
-      ease: [0.36, 0.64, 0.36, 1], // Custom cubic-bezier for a non-linear "uncertain" feel
+      ease: [0.4, 0, 0.2, 1], // ease-in-out
       repeat: Infinity,
       delay,
     }}
@@ -117,8 +117,8 @@ export const AnimatedDiagram = () => {
             x="20%"
             y="20%"
             delay={0.6}
-            color="bg-chart-2"
-            shadowColor="hsl(var(--chart-2) / 0.7)"
+            color="bg-white"
+            shadowColor="rgba(255,255,255,0.7)"
           />
         </Orbit>
 
