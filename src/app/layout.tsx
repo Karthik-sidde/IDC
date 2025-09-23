@@ -7,6 +7,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'IDC Platform',
   description: 'A Futuristic Event Management Platform Prototype',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
