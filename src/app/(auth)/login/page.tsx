@@ -51,7 +51,6 @@ const registerSchema = z
     email: z.string().email("Invalid email address"),
     password: passwordSchema,
     confirmPassword: z.string(),
-    role: z.enum(["user", "speaker"]),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -155,9 +154,6 @@ export default function LoginPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
-    defaultValues: {
-      role: "user",
-    },
   });
 
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
@@ -193,10 +189,10 @@ export default function LoginPage() {
         id: `user-${Date.now()}`,
         name: data.name,
         email: data.email,
-        role: data.role,
+        role: 'user', // Always sign up as a regular user
         status: "active",
         emailVerified: true, // Bypassing email verification for now
-        verificationStatus: data.role === "speaker" ? ("pending" as const) : undefined,
+        verificationStatus: undefined, // Not a speaker initially
         profile: {
           avatar: `https://picsum.photos/seed/${Date.now()}/100/100`,
           bio: "",
@@ -291,7 +287,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(handleRegister)}>
             <CardContent className="space-y-4">
               <CardDescription className="text-center">
-                Create a new account.
+                Create a new account to join the community.
               </CardDescription>
 
               <div className="space-y-3">
@@ -313,32 +309,6 @@ export default function LoginPage() {
                 <Separator className="flex-1" />
                 <span className="text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1" />
-              </div>
-
-              <div className="space-y-2">
-                <Label>I want to sign up as a...</Label>
-                 <Controller
-                    name="role"
-                    control={control}
-                    render={({ field }) => (
-                        <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="grid grid-cols-2 gap-4"
-                        >
-                            <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                <RadioGroupItem value="user" id="r-user" className="sr-only"/>
-                                <User className="mb-3 h-6 w-6" />
-                                Attendee
-                            </Label>
-                            <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                                <RadioGroupItem value="speaker" id="r-speaker" className="sr-only"/>
-                                <Mic className="mb-3 h-6 w-6" />
-                                Speaker
-                            </Label>
-                        </RadioGroup>
-                    )}
-                />
               </div>
 
                <FormField 
@@ -408,3 +378,5 @@ export default function LoginPage() {
     </Card>
   );
 }
+
+    

@@ -40,10 +40,12 @@ export default function SpeakerVerificationPage() {
     }, 2000);
   };
   
-  if (user?.role !== 'speaker') {
+  if (!user) {
+    // Redirect to login if not authenticated
+    router.push('/login');
     return (
         <div className="text-center py-10">
-            <p className="text-muted-foreground">This page is for speakers only.</p>
+            <p className="text-muted-foreground">Please log in to apply for speaker verification.</p>
         </div>
     )
   }
@@ -84,7 +86,7 @@ export default function SpeakerVerificationPage() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-headline">Speaker Verification</h1>
+        <h1 className="text-2xl font-bold font-headline">Become a Speaker</h1>
         <p className="text-muted-foreground">
           To ensure the quality of our events, we require speakers to complete a
           brief verification process.
@@ -142,3 +144,5 @@ export default function SpeakerVerificationPage() {
     </div>
   );
 }
+
+    

@@ -60,17 +60,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       label: "Browse Events",
     },
     {
-      role: ["user"],
+      role: ["user", "speaker"],
       href: "/my-events",
       icon: Ticket,
       label: "My Tickets",
     },
     {
-      role: ["speaker"],
+      role: ["user", "speaker"],
       href: "/speaker-verification",
       icon: FileCheck,
-      label: "Verification",
-      condition: (user: any) => user?.verificationStatus === 'pending',
+      label: "Become a Speaker",
+      condition: (user: any) => user?.verificationStatus !== 'approved',
     },
     {
       role: ["admin", "super_admin", "speaker"],
@@ -287,3 +287,5 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     </SidebarProvider>
   );
 }
+
+    
