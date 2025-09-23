@@ -112,8 +112,8 @@ const FormField = ({ name, label, icon, placeholder, type = "text", register, er
     return (
         <div className="space-y-2">
             <Label htmlFor={name}>{label}</Label>
-            <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground">{icon}</div>
+            <div className="relative flex items-center">
+                <div className="absolute left-3 h-4 w-4 text-muted-foreground">{icon}</div>
                 <Input
                     id={name}
                     type={type}
@@ -127,7 +127,7 @@ const FormField = ({ name, label, icon, placeholder, type = "text", register, er
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0, opacity: 0 }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center"
+                            className="absolute right-3 h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center"
                         >
                             <Check className="h-3 w-3" />
                         </motion.div>
