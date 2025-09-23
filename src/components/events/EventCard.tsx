@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { format, isBefore, addHours, isWithinInterval } from "date-fns";
+import { format, isBefore, addHours, isWithinInterval, startOfToday, isSameDay, addDays } from "date-fns";
 import {
   ArrowRight,
   Calendar,
@@ -27,9 +27,10 @@ export function EventCard({ event }: EventCardProps) {
   const isFree = event.tickets.some((t) => t.price === 0);
   const now = new Date();
   const eventDate = new Date(event.date);
+  const today = startOfToday();
 
-  const isPast = isBefore(eventDate, now);
-  const isOngoing = isWithinInterval(now, { start: eventDate, end: addHours(eventDate, 48) }) || isWithinInterval(eventDate, {start: now, end: addHours(now, 48)});
+  const isPast = isBefore(eventDate, today);
+  const isOngoing = !isPast && (isSameDay(eventDate, now) || isBefore(eventDate, addDays(now, 2)));
 
 
   const cardContent = (
@@ -51,7 +52,7 @@ export function EventCard({ event }: EventCardProps) {
             />
              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
              
-             {isOngoing && !isPast && (
+             {isOngoing && (
                 <Badge
                     variant="destructive"
                     className="absolute left-2 top-2 animate-pulse"
