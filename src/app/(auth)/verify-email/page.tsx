@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Suspense } from 'react';
+import { Suspense, useContext } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +17,13 @@ import { useState } from "react";
 import { verifyUserEmail } from '@/lib/mock-data';
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
+import { UserContext } from '@/context/UserContext';
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { login } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const email = searchParams.get('email');
 
@@ -36,9 +38,10 @@ function VerifyEmailContent() {
       if (isVerified) {
         toast({
             title: "Email Verified!",
-            description: "Your email has been successfully verified. You can now log in.",
+            description: "Your email has been successfully verified.",
         });
-        router.push("/login");
+        login(email);
+        router.push("/profile-setup");
       } else {
          toast({
             variant: "destructive",
