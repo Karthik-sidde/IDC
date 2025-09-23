@@ -29,7 +29,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "@/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert, Loader2, Wand2, Upload } from "lucide-react";
-import { generateEventImage } from "@/ai/flows/generate-event-image";
 import Image from "next/image";
 
 export default function NewEventPage() {
@@ -47,7 +46,6 @@ export default function NewEventPage() {
   const [ticketQuantity, setTicketQuantity] = useState(100);
   const [eventType, setEventType] = useState<"free" | "paid">("paid");
   const [isPublishing, setIsPublishing] = useState(false);
-  const [imageSource, setImageSource] = useState<'ai' | 'upload'>('ai');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const canCreateEvent = user?.role.includes('admin') || (user?.role === 'speaker' && user?.verificationStatus === 'approved');
@@ -82,32 +80,13 @@ export default function NewEventPage() {
     
     let finalCoverImage = `https://picsum.photos/seed/event${Date.now()}/600/400`;
 
-    if (imageSource === 'ai') {
-        toast({
-            title: "Generating Event Art...",
-            description: "Our AI is creating a custom cover image for your event. Please wait.",
+    if (imagePreview) {
+        finalCoverImage = imagePreview;
+         toast({
+            title: "Processing Upload...",
+            description: "Your custom image is being saved.",
         });
-        try {
-            const imagePrompt = `${title}: ${description}`;
-            finalCoverImage = await generateEventImage(imagePrompt);
-        } catch (error) {
-            console.error("Failed to generate event image:", error);
-            toast({
-                variant: "destructive",
-                title: "Image Generation Failed",
-                description: "Using a default image. You can edit the event later.",
-            });
-        }
-    } else {
-        if (imagePreview) {
-            finalCoverImage = imagePreview;
-             toast({
-                title: "Processing Upload...",
-                description: "Your custom image is being saved.",
-            });
-        }
     }
-
 
     const newEvent: Event = {
       id: `event-${Date.now()}`,
@@ -236,39 +215,19 @@ export default function NewEventPage() {
         <CardHeader>
           <CardTitle>Cover Image</CardTitle>
           <CardDescription>
-            Choose how to add a cover image for your event.
+            Upload a cover image for your event.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-           <RadioGroup
-              value={imageSource}
-              onValueChange={(value) => setImageSource(value as 'ai' | 'upload')}
-              className="grid grid-cols-2 gap-4"
-              disabled={isPublishing}
-            >
-              <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                <RadioGroupItem value="ai" id="r-ai" className="sr-only" />
-                <Wand2 className="mb-3 h-6 w-6" />
-                AI Generate
-              </Label>
-              <Label className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-                <RadioGroupItem value="upload" id="r-upload" className="sr-only" />
-                <Upload className="mb-3 h-6 w-6" />
-                Upload Image
-              </Label>
-            </RadioGroup>
-
-            {imageSource === 'upload' && (
-              <div className="space-y-2">
-                <Label htmlFor="cover-image-upload">Upload Cover Image</Label>
-                <Input id="cover-image-upload" type="file" accept="image/*" onChange={handleFileChange} disabled={isPublishing}/>
-                {imagePreview && (
-                    <div className="relative mt-4 h-48 w-full rounded-md border">
-                        <Image src={imagePreview} alt="Image preview" fill className="object-cover rounded-md" />
-                    </div>
-                )}
-              </div>
+            <div className="space-y-2">
+            <Label htmlFor="cover-image-upload">Upload Cover Image</Label>
+            <Input id="cover-image-upload" type="file" accept="image/*" onChange={handleFileChange} disabled={isPublishing}/>
+            {imagePreview && (
+                <div className="relative mt-4 h-48 w-full rounded-md border">
+                    <Image src={imagePreview} alt="Image preview" fill className="object-cover rounded-md" />
+                </div>
             )}
+            </div>
         </CardContent>
       </Card>
 
@@ -380,5 +339,3 @@ export default function NewEventPage() {
     </form>
   );
 }
-
-    
