@@ -246,7 +246,7 @@ export default function LoginPage() {
             <TabsTrigger value="register">Create Account</TabsTrigger>
           </TabsList>
         </CardHeader>
-        <TabsContent value="login" className="min-h-[510px]">
+        <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <CardDescription className="text-center">
@@ -321,7 +321,7 @@ export default function LoginPage() {
             </CardFooter>
           </form>
         </TabsContent>
-        <TabsContent value="register" className="min-h-[510px]">
+        <TabsContent value="register">
           <form onSubmit={handleSubmit(handleRegister)}>
             <CardContent className="space-y-4">
               <CardDescription className="text-center">
