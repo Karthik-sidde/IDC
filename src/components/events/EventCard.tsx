@@ -29,7 +29,8 @@ export function EventCard({ event }: EventCardProps) {
   const eventDate = new Date(event.date);
 
   const isPast = isBefore(eventDate, now);
-  const isOngoing = isWithinInterval(eventDate, { start: now, end: addHours(now, 48) });
+  const isOngoing = isWithinInterval(now, { start: eventDate, end: addHours(eventDate, 48) }) || isWithinInterval(eventDate, {start: now, end: addHours(now, 48)});
+
 
   const cardContent = (
     <Card className={cn(

@@ -65,11 +65,10 @@ export default function AdminEventsPage() {
     if (isBefore(eventDate, today)) {
         return "Past";
     }
-    if (isBefore(eventDate, addDays(now, 2)) && !isBefore(eventDate, now)) {
+    
+    if (isSameDay(eventDate, now) || (isBefore(eventDate, addDays(now, 2)) && isBefore(now, eventDate))) {
         return "Ongoing";
     }
-    
-    if (isSameDay(eventDate, now)) return "Ongoing";
     
     return "Upcoming";
   };
