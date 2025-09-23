@@ -28,7 +28,8 @@ import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "@/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, Loader2 } from "lucide-react";
+import { generateEventImage } from "@/ai/flows/generate-event-image";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -44,6 +45,7 @@ export default function NewEventPage() {
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketQuantity, setTicketQuantity] = useState(100);
   const [eventType, setEventType] = useState<"free" | "paid">("paid");
+  const [isPublishing, setIsPublishing] = useState(false);
   
   const canCreateEvent = user?.role.includes('admin') || (user?.role === 'speaker' && user?.verificationStatus === 'approved');
 
@@ -57,9 +59,30 @@ export default function NewEventPage() {
     }
   }, [eventType, ticketPrice]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !canCreateEvent) return;
+
+    setIsPublishing(true);
+    toast({
+        title: "Generating Event Art...",
+        description: "Our AI is creating a custom cover image for your event. Please wait.",
+    });
+
+    let coverImage;
+    try {
+        const imagePrompt = `${title}: ${description}`;
+        coverImage = await generateEventImage(imagePrompt);
+    } catch (error) {
+        console.error("Failed to generate event image:", error);
+        toast({
+            variant: "destructive",
+            title: "Image Generation Failed",
+            description: "Using a default image. You can edit the event later.",
+        });
+        coverImage = `https://picsum.photos/seed/event${Date.now()}/600/400`;
+    }
+
 
     const newEvent: Event = {
       id: `event-${Date.now()}`,
@@ -79,11 +102,12 @@ export default function NewEventPage() {
         },
       ],
       organizerId: user.id,
-      coverImage: `https://picsum.photos/seed/event${Date.now()}/600/400`,
+      coverImage: coverImage,
       speakers: [],
     };
 
     addMockEvent(newEvent);
+    setIsPublishing(false);
 
     toast({
       title: "Event Published!",
@@ -134,6 +158,7 @@ export default function NewEventPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              disabled={isPublishing}
             />
           </div>
           <div className="space-y-2">
@@ -144,6 +169,7 @@ export default function NewEventPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
+              disabled={isPublishing}
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -153,6 +179,7 @@ export default function NewEventPage() {
                 onValueChange={(value) => setChapter(value)}
                 value={chapter}
                 required
+                disabled={isPublishing}
               >
                 <SelectTrigger id="chapter">
                   <SelectValue placeholder="Select chapter" />
@@ -173,6 +200,7 @@ export default function NewEventPage() {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
+                disabled={isPublishing}
               />
             </div>
           </div>
@@ -193,6 +221,7 @@ export default function NewEventPage() {
               <Select
                 onValueChange={(value) => setVenueType(value as "physical" | "online")}
                 value={venueType}
+                disabled={isPublishing}
               >
                 <SelectTrigger id="venue-type">
                   <SelectValue placeholder="Select venue type" />
@@ -211,6 +240,7 @@ export default function NewEventPage() {
                 value={venueDetails}
                 onChange={(e) => setVenueDetails(e.target.value)}
                 required
+                disabled={isPublishing}
               />
             </div>
           </div>
@@ -221,6 +251,7 @@ export default function NewEventPage() {
                 defaultValue={eventType}
                 onValueChange={(value) => setEventType(value as 'free' | 'paid')}
                 className="flex items-center gap-4"
+                disabled={isPublishing}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="paid" id="r-paid" />
@@ -242,6 +273,7 @@ export default function NewEventPage() {
                 value={ticketTier}
                 onChange={(e) => setTicketTier(e.target.value)}
                 defaultValue="General Admission"
+                disabled={isPublishing}
               />
             </div>
             <div className="space-y-2">
@@ -252,7 +284,7 @@ export default function NewEventPage() {
                 placeholder="e.g., 25"
                 value={ticketPrice}
                 onChange={(e) => setTicketPrice(Number(e.target.value))}
-                disabled={eventType === "free"}
+                disabled={eventType === "free" || isPublishing}
                 required
               />
             </div>
@@ -265,6 +297,7 @@ export default function NewEventPage() {
                 value={ticketQuantity}
                 onChange={(e) => setTicketQuantity(Number(e.target.value))}
                 required
+                disabled={isPublishing}
               />
             </div>
           </div>
@@ -272,8 +305,11 @@ export default function NewEventPage() {
       </Card>
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" type="button" onClick={() => router.back()}>Cancel</Button>
-        <Button type="submit" className="hover:glow">Publish Event</Button>
+        <Button variant="outline" type="button" onClick={() => router.back()} disabled={isPublishing}>Cancel</Button>
+        <Button type="submit" className="hover:glow" disabled={isPublishing}>
+            {isPublishing ? <Loader2 className="animate-spin" /> : null}
+            {isPublishing ? "Publishing..." : "Publish Event"}
+        </Button>
       </div>
     </form>
   );
