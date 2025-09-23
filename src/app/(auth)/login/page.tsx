@@ -356,7 +356,7 @@ export default function LoginPage() {
                     placeholder="State your name"
                     register={register}
                     errors={errors}
-                    isDirty={dirtyFields.name}
+                    isDirty={!!dirtyFields.name}
                     isValid={!errors.name}
                 />
 
@@ -368,7 +368,7 @@ export default function LoginPage() {
                     type="email"
                     register={register}
                     errors={errors}
-                    isDirty={dirtyFields.email}
+                    isDirty={!!dirtyFields.email}
                     isValid={!errors.email}
                 />
 
@@ -380,8 +380,8 @@ export default function LoginPage() {
                     type="password"
                     register={register}
                     errors={errors}
-                    isDirty={dirtyFields.password}
-                    isValid={!errors.password && passwordValue?.length > 0}
+                    isDirty={!!dirtyFields.password}
+                    isValid={!errors.password && !!passwordValue && passwordValue.length > 0}
                 />
                 
                  <FormField 
@@ -392,8 +392,8 @@ export default function LoginPage() {
                     type="password"
                     register={register}
                     errors={errors}
-                    isDirty={dirtyFields.confirmPassword}
-                    isValid={!errors.confirmPassword && watch("confirmPassword") === passwordValue}
+                    isDirty={!!dirtyFields.confirmPassword}
+                    isValid={!errors.confirmPassword && !!watch("confirmPassword") && watch("confirmPassword") === passwordValue}
                 />
 
             </CardContent>
@@ -417,5 +417,3 @@ export default function LoginPage() {
     </Card>
   );
 }
-
-    
