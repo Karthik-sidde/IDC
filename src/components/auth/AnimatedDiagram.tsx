@@ -6,7 +6,7 @@ import { AppLogo } from "../AppLogo";
 
 const Node = ({ x, y, delay }: { x: string; y: string; delay: number }) => (
   <motion.div
-    className="absolute h-3 w-3 rounded-full bg-primary/80"
+    className="absolute h-3 w-3 rounded-full bg-primary shadow-[0_0_12px_theme(colors.primary/80%)]"
     style={{ left: x, top: y }}
     initial={{ scale: 0, opacity: 0 }}
     animate={{ scale: [0, 1.2, 1], opacity: 1 }}
@@ -32,7 +32,7 @@ const Connector = ({
 
   return (
     <motion.div
-      className="absolute h-px origin-left bg-gradient-to-r from-primary/80 to-primary/20"
+      className="absolute h-px origin-left bg-gradient-to-r from-primary to-primary/30"
       style={{
         left: `${x1}px`,
         top: `${y1}px`,
