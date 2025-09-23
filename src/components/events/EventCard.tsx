@@ -24,12 +24,36 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
-  const isFree = event.tickets.some((t) => t.price === 0);
   const now = new Date();
   const eventDate = new Date(event.date);
   
   const isPast = isBefore(eventDate, now);
   const isOngoing = !isPast && isBefore(eventDate, addDays(now, 2));
+
+  const getPriceDisplay = () => {
+      if (!event.tickets || event.tickets.length === 0) {
+          return "N/A";
+      }
+
+      if (event.tickets.length === 1) {
+          const price = event.tickets[0].price;
+          return price === 0 ? "Free" : `₹${price}`;
+      }
+
+      const prices = event.tickets.map(t => t.price);
+      const minPrice = Math.min(...prices);
+
+      if (minPrice === 0) {
+          // If there are multiple tiers and one is free, we can decide what to show.
+          // "Free & Paid" or "From Free". Let's show "From ₹0" for consistency.
+          return `From ₹0`;
+      }
+      
+      return `From ₹${minPrice}`;
+  }
+  
+  const priceDisplay = getPriceDisplay();
+  const isFree = priceDisplay === "Free" || priceDisplay === "From ₹0";
 
 
   const cardContent = (
@@ -61,10 +85,10 @@ export function EventCard({ event }: EventCardProps) {
              )}
 
             <Badge
-              variant={isFree ? "secondary" : "destructive"}
+              variant={isFree ? "secondary" : "default"}
               className="absolute right-2 top-2"
             >
-              {isFree ? "Free" : `₹${event.tickets[0].price}`}
+              {priceDisplay}
             </Badge>
           </div>
         </CardHeader>
