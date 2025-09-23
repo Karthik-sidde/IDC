@@ -1,12 +1,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { format } from "date-fns";
+import { format, isBefore, addHours, isWithinInterval } from "date-fns";
 import {
   ArrowRight,
   Calendar,
   MapPin,
-  Ticket,
+  Ban,
 } from "lucide-react";
 import { type Event } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface EventCardProps {
   event: Event;
@@ -24,20 +25,40 @@ interface EventCardProps {
 
 export function EventCard({ event }: EventCardProps) {
   const isFree = event.tickets.some((t) => t.price === 0);
+  const now = new Date();
+  const eventDate = new Date(event.date);
 
-  return (
-    <Link href={`/events/${event.id}`}>
-      <Card className="group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1 glass">
+  const isPast = isBefore(eventDate, now);
+  const isOngoing = isWithinInterval(eventDate, { start: now, end: addHours(now, 48) });
+
+  const cardContent = (
+    <Card className={cn(
+        "group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1 glass",
+        isPast && "opacity-60 grayscale hover:shadow-lg hover:-translate-y-0 cursor-not-allowed"
+    )}>
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
               src={event.coverImage}
               alt={event.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className={cn(
+                  "object-cover transition-transform duration-300",
+                  !isPast && "group-hover:scale-105"
+              )}
               data-ai-hint="event cover"
             />
              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+             
+             {isOngoing && !isPast && (
+                <Badge
+                    variant="destructive"
+                    className="absolute left-2 top-2 animate-pulse"
+                >
+                    Ongoing
+                </Badge>
+             )}
+
             <Badge
               variant={isFree ? "secondary" : "destructive"}
               className="absolute right-2 top-2"
@@ -63,12 +84,28 @@ export function EventCard({ event }: EventCardProps) {
             </p>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-            <Button variant="outline" className="w-full">
-                <span>View Details</span>
-                <ArrowRight className="transition-transform group-hover:translate-x-1" />
-            </Button>
+            {isPast ? (
+                 <Button variant="outline" className="w-full" disabled>
+                    <Ban />
+                    <span>Bookings Closed</span>
+                </Button>
+            ) : (
+                <Button variant="outline" className="w-full">
+                    <span>View Details</span>
+                    <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Button>
+            )}
         </CardFooter>
       </Card>
+  );
+
+  if (isPast) {
+    return <div>{cardContent}</div>;
+  }
+
+  return (
+    <Link href={`/events/${event.id}`}>
+      {cardContent}
     </Link>
   );
 }
