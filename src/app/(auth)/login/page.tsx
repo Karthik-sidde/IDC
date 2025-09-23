@@ -235,7 +235,7 @@ export default function LoginPage() {
 
 
   return (
-    <Card className="w-full max-w-md glass">
+    <Card className="w-full max-w-md glass min-h-[720px]">
       <Tabs defaultValue="login" className="w-full">
         <CardHeader>
           <div className="mx-auto mb-4">
