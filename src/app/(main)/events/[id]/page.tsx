@@ -232,6 +232,22 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 </TabsList>
                 <TabsContent value="overview" className='mt-6 text-foreground/90 prose dark:prose-invert max-w-none'>
                     <p className='whitespace-pre-wrap leading-relaxed'>{event.description}</p>
+                     {event.venue.type === 'physical' && event.venue.googleMapsLink && (
+                        <div className="mt-8">
+                            <h3 className="font-headline text-2xl font-bold">Location</h3>
+                            <div className="aspect-video w-full overflow-hidden rounded-lg border mt-4">
+                                <iframe
+                                    src={event.venue.googleMapsLink}
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                ></iframe>
+                            </div>
+                        </div>
+                    )}
                 </TabsContent>
                  <TabsContent value="speakers" className='mt-6 space-y-6'>
                     {event.speakers.length > 0 ? (

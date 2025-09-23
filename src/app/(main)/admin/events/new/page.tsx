@@ -29,7 +29,7 @@ import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "@/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert, Loader2, Wand2, Upload, Users, Check, ChevronsUpDown } from "lucide-react";
+import { ShieldAlert, Loader2, Wand2, Upload, Users, Check, ChevronsUpDown, Map } from "lucide-react";
 import Image from "next/image";
 import {
   Popover,
@@ -58,6 +58,7 @@ export default function NewEventPage() {
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
   const [venueDetails, setVenueDetails] = useState("Some place cool");
+  const [googleMapsLink, setGoogleMapsLink] = useState("");
   const [ticketTier, setTicketTier] = useState("General Admission");
   const [ticketPrice, setTicketPrice] = useState(0);
   const [venueCapacity, setVenueCapacity] = useState(100);
@@ -81,6 +82,7 @@ export default function NewEventPage() {
   useEffect(() => {
     if (venueType === 'online') {
       setVenueCapacity(Infinity);
+      setGoogleMapsLink(""); // Clear maps link for online events
     } else {
       if (venueCapacity === Infinity) {
         setVenueCapacity(100); // Reset to a default value
@@ -126,6 +128,7 @@ export default function NewEventPage() {
       venue: {
         type: venueType,
         details: venueDetails,
+        googleMapsLink: venueType === 'physical' ? googleMapsLink : undefined,
       },
       capacity: venueType === 'online' ? Infinity : venueCapacity,
       tickets: [
@@ -330,52 +333,73 @@ export default function NewEventPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="venue-type">Venue Type</Label>
-              <Select
+          <div className="space-y-2">
+              <Label>Venue Type</Label>
+               <RadioGroup
+                defaultValue={venueType}
                 onValueChange={(value) => setVenueType(value as "physical" | "online")}
-                value={venueType}
+                className="grid grid-cols-2 gap-4"
                 disabled={isPublishing}
               >
-                <SelectTrigger id="venue-type">
-                  <SelectValue placeholder="Select venue type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="physical">Physical</SelectItem>
-                  <SelectItem value="online">Online</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
+                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                  <RadioGroupItem value="physical" id="r-physical" />
+                  <span>Physical</span>
+                </Label>
+                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                  <RadioGroupItem value="online" id="r-online" />
+                  <span>Online</span>
+                </Label>
+              </RadioGroup>
+          </div>
+          
+           <div className="space-y-2">
               <Label htmlFor="venue-details">Venue Details</Label>
               <Input
                 id="venue-details"
-                placeholder="e.g., Convention Center or Zoom Link"
+                placeholder={venueType === 'physical' ? "e.g., Convention Center, Bangalore" : "e.g., Zoom Link"}
                 value={venueDetails}
                 onChange={(e) => setVenueDetails(e.target.value)}
                 required
                 disabled={isPublishing}
               />
             </div>
-          </div>
+            
+            {venueType === 'physical' && (
+                 <div className="space-y-2">
+                    <Label htmlFor="google-maps-link">Google Maps Embed Link</Label>
+                    <div className="relative">
+                        <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            id="google-maps-link"
+                            placeholder="Paste the HTML embed code from Google Maps"
+                            value={googleMapsLink}
+                            onChange={(e) => setGoogleMapsLink(e.target.value)}
+                            disabled={isPublishing}
+                            className="pl-10"
+                        />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        Go to Google Maps, find your location, click 'Share', then 'Embed a map', and copy the `src` URL.
+                    </p>
+                </div>
+            )}
           
            <div className="space-y-2">
               <Label>Event Type</Label>
               <RadioGroup
                 defaultValue={eventType}
                 onValueChange={(value) => setEventType(value as 'free' | 'paid')}
-                className="flex items-center gap-4"
+                className="grid grid-cols-2 gap-4"
                 disabled={isPublishing}
               >
-                <div className="flex items-center space-x-2">
+                <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
                   <RadioGroupItem value="paid" id="r-paid" />
-                  <Label htmlFor="r-paid">Paid</Label>
-                </div>
-                <div className="flex items-center space-x-2">
+                  <span>Paid</span>
+                </Label>
+                 <Label className="flex items-center space-x-2 rounded-md border p-4 cursor-pointer data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
                   <RadioGroupItem value="free" id="r-free" />
-                  <Label htmlFor="r-free">Free</Label>
-                </div>
+                  <span>Free</span>
+                </Label>
               </RadioGroup>
             </div>
 
@@ -409,7 +433,7 @@ export default function NewEventPage() {
                 id="venue-capacity"
                 type="number"
                 placeholder="e.g., 500"
-                value={venueCapacity}
+                value={isFinite(venueCapacity) ? venueCapacity : ''}
                 onChange={(e) => setVenueCapacity(Number(e.target.value))}
                 required
                 disabled={isPublishing || venueType === 'online'}

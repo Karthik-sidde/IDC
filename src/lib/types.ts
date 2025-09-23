@@ -40,6 +40,7 @@ export interface Event {
   venue: {
     type: "physical" | "online";
     details: string; // Address or URL
+    googleMapsLink?: string;
   };
   capacity: number; // Can be Infinity for online events
   tickets: {
