@@ -36,6 +36,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 type ScanResult = {
   status: "success" | "already_scanned" | "invalid";
