@@ -65,7 +65,7 @@ export default function NewEventPage() {
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
   const [venueDetails, setVenueDetails] = useState("Some place cool");
   const [googleMapsLink, setGoogleMapsLink] = useState("");
-  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([{ tier: "General Admission", price: 10 }]);
+  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([{ tier: "General Admission", price: 0 }]);
   const [venueCapacity, setVenueCapacity] = useState(100);
   const [isPublishing, setIsPublishing] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -500,5 +500,7 @@ export default function NewEventPage() {
     </form>
   );
 }
+
+    
 
     
