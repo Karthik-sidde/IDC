@@ -112,7 +112,7 @@ export const mockSpeakers: Speaker[] = [
 ]
 
 
-const mockEvents: Event[] = [
+let mockEvents: Event[] = [
   {
     id: "event-1",
     title: "Future of Web3 Summit",
@@ -271,3 +271,5 @@ export const verifyUserEmail = (email: string) => {
 
 // Also export the raw data for cases where we don't want to use the functions
 export type { User, Event, Ticket, UserRole, Speaker } from "./types";
+
+    
