@@ -12,18 +12,13 @@ import {
   Banknote,
   Users,
   CalendarCheck,
-  Activity,
   ArrowRight,
   UserPlus,
-  Ticket,
 } from "lucide-react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
   Line,
   LineChart,
 } from "recharts";
@@ -258,8 +253,6 @@ export default function AdminDashboardPage() {
              <ChartContainer config={revenueChartConfig} className="h-[250px] w-full">
               <LineChart data={dailyRevenueData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0,6)} />
-                <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => `₹${Number(value) / 1000}k`} />
                 <ChartTooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent indicator="dot"/>} />
                 <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} dot={false} />
               </LineChart>
@@ -275,8 +268,6 @@ export default function AdminDashboardPage() {
                 <ChartContainer config={topEventsChartConfig} className="h-[250px] w-full">
                     <BarChart data={topEventsData} layout="vertical" margin={{ left: -10, right: 30 }}>
                         <CartesianGrid horizontal={false} />
-                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={80} />
-                        <XAxis dataKey="revenue" type="number" hide />
                         <ChartTooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
                         <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
                     </BarChart>
@@ -292,83 +283,83 @@ export default function AdminDashboardPage() {
                     <CardDescription>Events happening now or in the next 48 hours.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {ongoingEvents.length &gt; 0 ? ongoingEvents.map(event =&gt; {
+                    {ongoingEvents.length > 0 ? ongoingEvents.map(event => {
                         const registrations = getRegistrationsForEvent(event.id);
                         const capacity = event.capacity;
                         const progress = capacity === Infinity ? 0 : (registrations / capacity) * 100;
                         return (
-                            &lt;div key={event.id}&gt;
-                                &lt;div className="flex justify-between items-center mb-1"&gt;
-                                    &lt;Link href={`/events/${event.id}`} className="font-semibold hover:underline truncate"&gt;{event.title}&lt;/Link&gt;
-                                    &lt;span className="text-sm font-medium text-muted-foreground"&gt;
+                            <div key={event.id}>
+                                <div className="flex justify-between items-center mb-1">
+                                    <Link href={`/events/${event.id}`} className="font-semibold hover:underline truncate">{event.title}</Link>
+                                    <span className="text-sm font-medium text-muted-foreground">
                                         {registrations} / {capacity === Infinity ? '∞' : capacity}
-                                    &lt;/span&gt;
-                                &lt;/div&gt;
-                                &lt;Progress value={progress} /&gt;
-                                &lt;div className="flex justify-between items-center"&gt;
-                                    &lt;p className="text-xs text-muted-foreground mt-1"&gt;{format(event.date, "MMM d, p")}&lt;/p&gt;
-                                    &lt;Badge variant="destructive" className="animate-pulse"&gt;Ongoing&lt;/Badge&gt;
-                                &lt;/div&gt;
-                            &lt;/div&gt;
+                                    </span>
+                                </div>
+                                <Progress value={progress} />
+                                <div className="flex justify-between items-center">
+                                    <p className="text-xs text-muted-foreground mt-1">{format(event.date, "MMM d, p")}</p>
+                                    <Badge variant="destructive" className="animate-pulse">Ongoing</Badge>
+                                </div>
+                            </div>
                         )
                     }) : (
-                        &lt;p className="text-sm text-muted-foreground text-center py-4"&gt;No ongoing events right now.&lt;/p&gt;
+                        <p className="text-sm text-muted-foreground text-center py-4">No ongoing events right now.</p>
                     )}
-                &lt;/CardContent&gt;
-            &lt;/Card&gt;
+                </CardContent>
+            </Card>
 
-            &lt;Card className="glass"&gt;
-                &lt;CardHeader&gt;
-                    &lt;CardTitle className="font-headline"&gt;Upcoming Events&lt;/CardTitle&gt;
-                &lt;/CardHeader&gt;
-                &lt;CardContent className="space-y-3"&gt;
-                    {upcomingEvents.slice(0, 5).map((event, index) =&gt; (
-                        &lt;div key={event.id}&gt;
-                            &lt;div className="flex justify-between items-start"&gt;
-                                &lt;div&gt;
-                                    &lt;p className="font-semibold"&gt;{event.title}&lt;/p&gt;
-                                    &lt;p className="text-sm text-muted-foreground"&gt;{format(event.date, "eeee, MMM d")}&lt;/p&gt;
-                                &lt;/div&gt;
-                                &lt;Link href={`/events/${event.id}`}&gt;
-                                    &lt;Button variant="ghost" size="sm"&gt;
+            <Card className="glass">
+                <CardHeader>
+                    <CardTitle className="font-headline">Upcoming Events</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {upcomingEvents.slice(0, 5).map((event, index) => (
+                        <div key={event.id}>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="font-semibold">{event.title}</p>
+                                    <p className="text-sm text-muted-foreground">{format(event.date, "eeee, MMM d")}</p>
+                                </div>
+                                <Link href={`/events/${event.id}`}>
+                                    <Button variant="ghost" size="sm">
                                         View
-                                        &lt;ArrowRight className="h-4 w-4 ml-1" /&gt;
-                                    &lt;/Button&gt;
-                                &lt;/Link&gt;
-                            &lt;/div&gt;
-                            {index &lt; upcomingEvents.slice(0, 5).length - 1 &amp;&amp; &lt;Separator className="my-2" /&gt;}
-                        &lt;/div&gt;
-                    ))}&lt;/CardContent&gt;
-            &lt;/Card&gt;
-        &lt;/div&gt;
-         &lt;Card className="glass lg:col-span-2"&gt;
-            &lt;CardHeader&gt;
-                &lt;CardTitle className="font-headline"&gt;Recent Activity&lt;/CardTitle&gt;
-            &lt;/CardHeader&gt;
-            &lt;CardContent className="space-y-4"&gt;
-                {recentActivity.map((activity, index) =&gt; (
-                    &lt;div key={index} className="flex items-center gap-4"&gt;
-                        &lt;Avatar className="h-9 w-9"&gt;
-                            &lt;AvatarImage src={activity.user?.profile.avatar} /&gt;
-                            &lt;AvatarFallback&gt;{activity.user?.name.charAt(0)}&lt;/AvatarFallback&gt;
-                        &lt;/Avatar&gt;
-                        &lt;div className="flex-1 text-sm"&gt;
-                            &lt;p&gt;
-                                &lt;span className="font-semibold"&gt;{activity.user?.name}&lt;/span&gt; purchased a ticket for &lt;Link href={`/events/${activity.event?.id}`} className="font-semibold hover:underline"&gt;{activity.event?.title}&lt;/Link&gt;.
-                            &lt;/p&gt;
-                            &lt;p className="text-xs text-muted-foreground"&gt;
+                                        <ArrowRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                </Link>
+                            </div>
+                            {index < upcomingEvents.slice(0, 5).length - 1 && <Separator className="my-2" />}
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
+         <Card className="glass lg:col-span-2">
+            <CardHeader>
+                <CardTitle className="font-headline">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {recentActivity.map((activity, index) => (
+                    <div key={index} className="flex items-center gap-4">
+                        <Avatar className="h-9 w-9">
+                            <AvatarImage src={activity.user?.profile.avatar} />
+                            <AvatarFallback>{activity.user?.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 text-sm">
+                            <p>
+                                <span className="font-semibold">{activity.user?.name}</span> purchased a ticket for <Link href={`/events/${activity.event?.id}`} className="font-semibold hover:underline">{activity.event?.title}</Link>.
+                            </p>
+                            <p className="text-xs text-muted-foreground">
                                 {format(activity.timestamp, "MMM d, p")}
-                            &lt;/p&gt;
-                        &lt;/div&gt;
-                        &lt;div className="font-semibold text-sm"&gt;
+                            </p>
+                        </div>
+                        <div className="font-semibold text-sm">
                            +₹{activity.ticket?.price}
-                        &lt;/div&gt;
-                    &lt;/div&gt;
-                ))}&lt;/CardContent&gt;
-        &lt;/Card&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
+                        </div>
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
-
-    
