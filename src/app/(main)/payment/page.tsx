@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Suspense } from 'react';
@@ -24,6 +25,7 @@ function PaymentPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [event, setEvent] = useState<Event | undefined>(undefined);
+  const [tierName, setTierName] = useState<string | null>(null);
   
   const eventId = searchParams.get('eventId');
 
@@ -32,11 +34,12 @@ function PaymentPageContent() {
       const foundEvent = getMockEvents().find(e => e.id === eventId);
       if (foundEvent) {
           setEvent(foundEvent);
+          setTierName(searchParams.get('tier'));
       } else {
           notFound();
       }
     }
-  }, [eventId]);
+  }, [eventId, searchParams]);
 
   useEffect(() => {
     if (!user) {
@@ -44,11 +47,16 @@ function PaymentPageContent() {
     }
   }, [user, router]);
   
-  if (!eventId || !event) {
+  if (!eventId || !event || !tierName) {
     return null; // Or a loading spinner
   }
 
-  const ticketInfo = event.tickets[0];
+  const ticketInfo = event.tickets.find(t => t.tier === tierName);
+
+  if (!ticketInfo) {
+      notFound();
+      return null;
+  }
 
   const handlePayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +69,7 @@ function PaymentPageContent() {
             id: `ticket-${Date.now()}`,
             eventId: event.id,
             userId: user.id,
+            tierName: ticketInfo.tier,
             price: ticketInfo.price,
             status: 'confirmed',
             qrCode: `mock-qr-code-${Date.now()}`

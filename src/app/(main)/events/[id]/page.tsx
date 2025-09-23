@@ -39,6 +39,7 @@ import { UserContext } from '@/context/UserContext';
 import { type Ticket as TicketType, type Event, type User, type Speaker } from '@/lib/types';
 import { LoginDialog } from '@/components/auth/LoginDialog';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -97,7 +98,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [isRegistered, setIsRegistered] = useState(false);
   const [attendees, setAttendees] = useState<User[]>([]);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const [justLoggedIn, setJustLoggedIn] = useState(false);
+  const [selectedFreeTier, setSelectedFreeTier] = useState<string | null>(null);
 
   useEffect(() => {
     const foundEvent = getMockEvents().find((e) => e.id === params.id);
@@ -122,36 +123,34 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
 
   if (!event) {
-    // To be handled by loading state in a real app, for now it might flash notFound
     const foundEvent = getMockEvents().find((e) => e.id === params.id);
     if (!foundEvent) notFound();
     setEvent(foundEvent);
-    return null; // Or a loading spinner
+    return null; 
   }
+  
   const organizer = mockUsers.find((u) => u.id === event.organizerId);
-  const isFree = event.tickets.some(ticket => ticket.price === 0);
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = (tier: { tier: string; price: number; }) => {
     if (!user) {
         sessionStorage.setItem('redirectAfterLogin', pathname);
         setIsLoginDialogOpen(true);
+    } else if (tier.price === 0) {
+        setSelectedFreeTier(tier.tier);
     } else {
-        // If user is logged in and event is not free, go to payment
-        if (!isFree) {
-            router.push(`/payment?eventId=${event.id}`);
-        }
-        // If it's free, the AlertDialog will be triggered by the button
+        router.push(`/payment?eventId=${event.id}&tier=${encodeURIComponent(tier.tier)}`);
     }
   };
 
   const processFreeRegistration = () => {
-    if (!user) return; // Should not happen
+    if (!user || !selectedFreeTier) return; 
     
     const newTicket: TicketType = {
         id: `ticket-${Date.now()}`,
         eventId: event.id,
         userId: user.id,
-        price: 0, // Free event
+        tierName: selectedFreeTier,
+        price: 0,
         status: 'confirmed',
         qrCode: `mock-qr-code-${Date.now()}`
     };
@@ -166,34 +165,67 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
       variant: "default",
       className: "bg-green-500 text-white",
     });
+
+    setSelectedFreeTier(null);
   };
 
   const onLoginSuccess = () => {
-    setJustLoggedIn(true);
     toast({
         title: "Logged In!",
         description: "You can now register for the event.",
     });
   }
 
-  const RegisterButton = () => (
-     <Button size="lg" className="w-full hover:glow text-lg py-6" disabled={isRegistered && !!user}>
-        {isRegistered && !!user ? (
+  const RegisterButton = ({ tier }: { tier: { tier: string, price: number }}) => {
+    const isFree = tier.price === 0;
+
+    const buttonContent = (
+      <Button 
+        size="lg" 
+        className="w-full hover:glow text-lg py-6"
+        disabled={isRegistered}
+        onClick={() => handleRegisterClick(tier)}
+      >
+        {isRegistered ? (
           <>
             <CheckCircle2 className="mr-2 h-5 w-5" />
             Registered
           </>
         ) : (
           <>
-            <Ticket className="mr-2 h-5 w-5" />
-            Register Now
+            {isFree ? <Ticket className="mr-2 h-5 w-5" /> : <CreditCard className="mr-2 h-5 w-5" />}
+            {isFree ? 'Register for Free' : `Buy for ₹${tier.price}`}
           </>
         )}
       </Button>
-  );
+    );
 
-  const MAX_DISPLAY_ATTENDEES = 7;
-  const remainingAttendees = attendees.length > MAX_DISPLAY_ATTENDEES ? attendees.length - MAX_DISPLAY_ATTENDEES : 0;
+    if (isFree && !isRegistered) {
+      return (
+        <AlertDialog open={!!selectedFreeTier} onOpenChange={(open) => !open && setSelectedFreeTier(null)}>
+          <AlertDialogTrigger asChild>
+            {buttonContent}
+          </AlertDialogTrigger>
+          <AlertDialogContent className='glass'>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
+              <AlertDialogDescription>
+                You are about to register for the "{selectedFreeTier}" ticket for "{event?.title}". This is a free ticket. Continue?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={processFreeRegistration}>
+                Confirm Registration
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      );
+    }
+    
+    return buttonContent;
+  }
 
   const defaultTab = event.speakers.length > 0 ? "speakers" : "overview";
 
@@ -308,13 +340,17 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             <CardHeader>
               <CardTitle className="font-headline">Tickets</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {event.tickets.map((ticket) => (
-                <div key={ticket.tier} className="flex justify-between items-center">
-                  <span className="font-medium">{ticket.tier}</span>
-                  <Badge variant="secondary" className="text-base">
-                    {ticket.price === 0 ? 'Free' : `₹${ticket.price.toFixed(2)}`}
-                  </Badge>
+            <CardContent className="space-y-4">
+              {event.tickets.map((ticket, index) => (
+                <div key={ticket.tier} className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">{ticket.tier}</span>
+                    <Badge variant="secondary" className="text-base">
+                      {ticket.price === 0 ? 'Free' : `₹${ticket.price.toFixed(2)}`}
+                    </Badge>
+                  </div>
+                  <RegisterButton tier={ticket} />
+                  {index < event.tickets.length - 1 && <Separator />}
                 </div>
               ))}
             </CardContent>
@@ -338,37 +374,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             </Card>
           )}
 
-          {user ? (
-            isFree ? (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <RegisterButton />
-                </AlertDialogTrigger>
-                <AlertDialogContent className='glass'>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You are about to register for "{event.title}". This is a free event. Continue?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={processFreeRegistration}>
-                      Confirm Registration
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            ) : (
-               <div onClick={handleRegisterClick}>
-                <RegisterButton />
-               </div>
-            )
-          ) : (
-             <div onClick={handleRegisterClick}>
-                <RegisterButton />
-             </div>
-          )}
         </div>
       </div>
        <LoginDialog 

@@ -116,7 +116,7 @@ export default function MyEventsPage() {
             <div className="space-y-4">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map(
-                  ({event, ticket}) => event && <EventTicketCard key={event.id} event={event} ticket={ticket} />
+                  ({event, ticket}) => event && <EventTicketCard key={ticket.id} event={event} ticket={ticket} />
                 )
               ) : (
                 <p className='text-center text-muted-foreground py-8'>You have no upcoming events.</p>
@@ -127,7 +127,7 @@ export default function MyEventsPage() {
             <div className="space-y-4">
               {pastEvents.length > 0 ? (
                 pastEvents.map(
-                  ({event, ticket}) => event && <EventTicketCard key={event.id} event={event} ticket={ticket} />
+                  ({event, ticket}) => event && <EventTicketCard key={ticket.id} event={event} ticket={ticket} />
                 )
               ) : (
                 <p className='text-center text-muted-foreground py-8'>You have no past events.</p>
@@ -146,7 +146,7 @@ export default function MyEventsPage() {
                 {selectedTicket.event.title}
               </DialogTitle>
               <DialogDescription>
-                This is your official ticket. Present this at the event for entry.
+                This is your official ticket for the "{selectedTicket.ticket.tierName}" tier. Present this at the event for entry.
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">

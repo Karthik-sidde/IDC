@@ -56,6 +56,7 @@ export interface Ticket {
   id: string;
   eventId: string;
   userId: string;
+  tierName: string;
   price: number;
   status: "pending" | "confirmed" | "cancelled";
   qrCode: string;
