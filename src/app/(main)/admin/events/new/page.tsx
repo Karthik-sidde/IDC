@@ -22,14 +22,29 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { addMockEvent } from "@/lib/mock-data";
-import { type Event } from "@/lib/types";
+import { addMockEvent, mockSpeakers } from "@/lib/mock-data";
+import { type Event, type Speaker } from "@/lib/types";
 import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "@/context/UserContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert, Loader2, Wand2, Upload } from "lucide-react";
+import { ShieldAlert, Loader2, Wand2, Upload, Users, Check, ChevronsUpDown } from "lucide-react";
 import Image from "next/image";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -47,6 +62,7 @@ export default function NewEventPage() {
   const [eventType, setEventType] = useState<"free" | "paid">("paid");
   const [isPublishing, setIsPublishing] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedSpeakers, setSelectedSpeakers] = useState<Speaker[]>([]);
   
   const canCreateEvent = user?.role.includes('admin') || (user?.role === 'speaker' && user?.verificationStatus === 'approved');
 
@@ -107,7 +123,7 @@ export default function NewEventPage() {
       ],
       organizerId: user.id,
       coverImage: finalCoverImage,
-      speakers: [],
+      speakers: selectedSpeakers,
     };
 
     addMockEvent(newEvent);
@@ -207,6 +223,71 @@ export default function NewEventPage() {
                 disabled={isPublishing}
               />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="glass">
+        <CardHeader>
+          <CardTitle>Speakers</CardTitle>
+          <CardDescription>Select the speakers for this event.</CardDescription>
+        </CardHeader>
+        <CardContent>
+           <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full justify-between"
+                disabled={isPublishing}
+              >
+                <div className="flex gap-1 items-center">
+                  <Users className="h-4 w-4" />
+                  Select Speakers
+                  {selectedSpeakers.length > 0 && <Badge variant="secondary" className="ml-2">{selectedSpeakers.length}</Badge>}
+                </div>
+                <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Search speakers..." />
+                <CommandList>
+                  <CommandEmpty>No speakers found.</CommandEmpty>
+                  <CommandGroup>
+                    {mockSpeakers.map((speaker) => (
+                      <CommandItem
+                        key={speaker.id}
+                        onSelect={() => {
+                          setSelectedSpeakers((current) =>
+                            current.some(s => s.id === speaker.id)
+                              ? current.filter((s) => s.id !== speaker.id)
+                              : [...current, speaker]
+                          );
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedSpeakers.some(s => s.id === speaker.id)
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        <span>{speaker.name}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <div className="mt-4 flex flex-wrap gap-2">
+              {selectedSpeakers.map(speaker => (
+                  <Badge key={speaker.id} variant="secondary">
+                      {speaker.name}
+                  </Badge>
+              ))}
           </div>
         </CardContent>
       </Card>
