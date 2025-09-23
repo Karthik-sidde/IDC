@@ -167,7 +167,7 @@ let mockEvents: Event[] = [
   },
   {
     id: "event-4",
-    title: "Innovate & Pitch Night",
+    title: "Innovate &amp; Pitch Night",
     description: "Watch the brightest startups pitch their ideas to a panel of venture capitalists. Network with founders and investors.",
     chapter: "Other",
     date: addDays(new Date(), 22),
@@ -224,6 +224,7 @@ let mockTickets: Ticket[] = [
     price: 50,
     status: "confirmed",
     qrCode: "mock-qr-code-1",
+    purchaseDate: subDays(new Date(), 12),
   },
   {
     id: "ticket-2",
@@ -233,7 +234,38 @@ let mockTickets: Ticket[] = [
     price: 10,
     status: "confirmed",
     qrCode: "mock-qr-code-2",
+    purchaseDate: subDays(new Date(), 35),
   },
+   {
+    id: "ticket-3",
+    eventId: "event-1",
+    userId: "user-1",
+    tierName: "General Admission",
+    price: 199,
+    status: "confirmed",
+    qrCode: "mock-qr-code-3",
+    purchaseDate: subDays(new Date(), 2),
+  },
+  {
+    id: "ticket-4",
+    eventId: "event-2",
+    userId: "admin-1",
+    tierName: "VIP Pass",
+    price: 599,
+    status: "confirmed",
+    qrCode: "mock-qr-code-4",
+    purchaseDate: subDays(new Date(), 5),
+  },
+  {
+    id: "ticket-5",
+    eventId: "event-4",
+    userId: "speaker-1",
+    tierName: "Online Access",
+    price: 25,
+    status: "confirmed",
+    qrCode: "mock-qr-code-5",
+    purchaseDate: subDays(new Date(), 8),
+  }
 ];
 
 // Function to get events
@@ -249,7 +281,7 @@ export const getMockTickets = () => mockTickets;
 
 // Function to add a ticket
 export const addMockTicket = (ticket: Ticket) => {
-  mockTickets.push(ticket);
+  mockTickets.push({...ticket, purchaseDate: new Date()});
 };
 
 // Function to add a user
@@ -274,5 +306,3 @@ export const verifyUserEmail = (email: string) => {
 
 // Also export the raw data for cases where we don't want to use the functions
 export type { User, Event, Ticket, UserRole, Speaker } from "./types";
-
-    

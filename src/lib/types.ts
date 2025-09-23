@@ -60,4 +60,7 @@ export interface Ticket {
   price: number;
   status: "pending" | "confirmed" | "cancelled";
   qrCode: string;
+  purchaseDate?: Date;
 }
+
+    
