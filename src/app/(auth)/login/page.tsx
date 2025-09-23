@@ -145,7 +145,7 @@ interface FormFieldProps {
 const FormField: React.FC<FormFieldProps> = ({ name, label, icon, placeholder, type = "text", register, errors, isDirty, isValid }) => (
     <div className="space-y-2">
         <Label htmlFor={name}>{label}</Label>
-        <div className="relative">
+        <div className="relative flex items-center">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground">{icon}</div>
             <Input
                 id={name}
@@ -160,7 +160,7 @@ const FormField: React.FC<FormFieldProps> = ({ name, label, icon, placeholder, t
                         initial={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.5 }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                        className="absolute right-3"
                     >
                         {isValid ? (
                              <Check className="h-5 w-5 text-green-500" />
@@ -439,5 +439,7 @@ export default function LoginPage() {
     </Card>
   );
 }
+
+    
 
     
