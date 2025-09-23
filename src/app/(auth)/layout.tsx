@@ -10,7 +10,7 @@ export default function AuthLayout({
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center p-4 flex-col">
       <Image
-        src="https://picsum.photos/seed/loginbg/1920/1080"
+        src="https://picsum.photos/seed/authbg/1920/1080"
         alt="Abstract futuristic background"
         fill
         className="object-cover"
