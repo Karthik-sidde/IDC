@@ -119,7 +119,7 @@ const FormField = ({ name, label, icon, placeholder, type = "text", register, er
                     type={type}
                     placeholder={placeholder}
                     {...register(name)}
-                    className={cn("pl-10", hasError && "border-destructive focus-visible:ring-destructive", showTick && "border-green-500")}
+                    className={cn("pl-10", hasError && "border-destructive animate-border-pulse focus-visible:ring-destructive", showTick && "border-green-500")}
                 />
                 <AnimatePresence>
                     {showTick && (
@@ -352,7 +352,7 @@ export default function LoginPage() {
                     isValid={!errors.name}
                 />
 
-                <FormField 
+                <FormField d
                     name="email"
                     label="Email"
                     icon={<AtSign />}
