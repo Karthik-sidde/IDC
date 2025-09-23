@@ -252,6 +252,28 @@ export default function LoginPage() {
               <CardDescription className="text-center">
                 Welcome back! Sign in to continue.
               </CardDescription>
+
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
+                  <CodebasicsIcon className="mr-2 h-5 w-5" />
+                  Continue with Codebasics
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <GoogleIcon className="mr-2 h-5 w-5" />
+                  Continue with Google
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <XIcon className="mr-2 h-5 w-5" />
+                  Continue with X
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Separator className="flex-1" />
+                <span className="text-xs text-muted-foreground">OR</span>
+                <Separator className="flex-1" />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
                 <div className="relative">
@@ -395,3 +417,5 @@ export default function LoginPage() {
     </Card>
   );
 }
+
+    
