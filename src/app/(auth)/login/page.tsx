@@ -38,6 +38,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const passwordSchema = z
   .string()
@@ -323,80 +324,82 @@ export default function LoginPage() {
         </TabsContent>
         <TabsContent value="register">
           <form onSubmit={handleSubmit(handleRegister)}>
-            <CardContent className="space-y-4">
-              <CardDescription className="text-center">
-                Create a new account to join the community.
-              </CardDescription>
+            <ScrollArea className="h-[420px] w-full">
+                <CardContent className="space-y-4 pr-6">
+                <CardDescription className="text-center">
+                    Create a new account to join the community.
+                </CardDescription>
 
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
-                  <CodebasicsIcon className="mr-2 h-5 w-5" />
-                  Continue with Codebasics
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <GoogleIcon className="mr-2 h-5 w-5" />
-                  Continue with Google
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <XIcon className="mr-2 h-5 w-5" />
-                  Continue with X
-                </Button>
-              </div>
+                <div className="space-y-3">
+                    <Button variant="outline" className="w-full text-black bg-white hover:bg-gray-100 hover:text-black">
+                    <CodebasicsIcon className="mr-2 h-5 w-5" />
+                    Continue with Codebasics
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                    <GoogleIcon className="mr-2 h-5 w-5" />
+                    Continue with Google
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                    <XIcon className="mr-2 h-5 w-5" />
+                    Continue with X
+                    </Button>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <Separator className="flex-1" />
-                <span className="text-xs text-muted-foreground">OR</span>
-                <Separator className="flex-1" />
-              </div>
-
-               <FormField 
-                    name="name"
-                    label="Name"
-                    icon={<User />}
-                    placeholder="Enter your name"
-                    register={register}
-                    errors={errors}
-                    isDirty={!!dirtyFields.name}
-                    isValid={!errors.name}
-                />
+                <div className="flex items-center space-x-2">
+                    <Separator className="flex-1" />
+                    <span className="text-xs text-muted-foreground">OR</span>
+                    <Separator className="flex-1" />
+                </div>
 
                 <FormField 
-                    name="email"
-                    label="Email"
-                    icon={<AtSign />}
-                    placeholder="Enter your email"
-                    type="email"
-                    register={register}
-                    errors={errors}
-                    isDirty={!!dirtyFields.email}
-                    isValid={!errors.email}
-                />
+                        name="name"
+                        label="Name"
+                        icon={<User />}
+                        placeholder="Enter your name"
+                        register={register}
+                        errors={errors}
+                        isDirty={!!dirtyFields.name}
+                        isValid={!errors.name}
+                    />
 
-                <FormField 
-                    name="password"
-                    label="Password"
-                    icon={<KeyRound />}
-                    placeholder="Enter your password"
-                    type="password"
-                    register={register}
-                    errors={errors}
-                    isDirty={!!dirtyFields.password}
-                    isValid={!errors.password && !!passwordValue && passwordValue.length > 0}
-                />
-                
-                 <FormField 
-                    name="confirmPassword"
-                    label="Re-enter Password"
-                    icon={<KeyRound />}
-                    placeholder="Re-enter your password"
-                    type="password"
-                    register={register}
-                    errors={errors}
-                    isDirty={!!dirtyFields.confirmPassword}
-                    isValid={!errors.confirmPassword && !!watch("confirmPassword") && watch("confirmPassword") === passwordValue}
-                />
+                    <FormField 
+                        name="email"
+                        label="Email"
+                        icon={<AtSign />}
+                        placeholder="Enter your email"
+                        type="email"
+                        register={register}
+                        errors={errors}
+                        isDirty={!!dirtyFields.email}
+                        isValid={!errors.email}
+                    />
 
-            </CardContent>
+                    <FormField 
+                        name="password"
+                        label="Password"
+                        icon={<KeyRound />}
+                        placeholder="Enter your password"
+                        type="password"
+                        register={register}
+                        errors={errors}
+                        isDirty={!!dirtyFields.password}
+                        isValid={!errors.password && !!passwordValue && passwordValue.length > 0}
+                    />
+                    
+                    <FormField 
+                        name="confirmPassword"
+                        label="Re-enter Password"
+                        icon={<KeyRound />}
+                        placeholder="Re-enter your password"
+                        type="password"
+                        register={register}
+                        errors={errors}
+                        isDirty={!!dirtyFields.confirmPassword}
+                        isValid={!errors.confirmPassword && !!watch("confirmPassword") && watch("confirmPassword") === passwordValue}
+                    />
+
+                </CardContent>
+            </ScrollArea>
             <CardFooter>
               <Button
                 type="submit"
