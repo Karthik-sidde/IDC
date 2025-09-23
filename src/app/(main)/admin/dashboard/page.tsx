@@ -168,13 +168,15 @@ export default function AdminDashboardPage() {
             <CardContent className="space-y-4">
                 {ongoingEvents.length > 0 ? ongoingEvents.map(event => {
                     const registrations = getRegistrationsForEvent(event.id);
-                    const capacity = event.tickets.reduce((acc, t) => acc + t.quantity, 0);
-                    const progress = (registrations / capacity) * 100;
+                    const capacity = event.capacity;
+                    const progress = capacity === Infinity ? 0 : (registrations / capacity) * 100;
                     return (
                         <div key={event.id}>
                             <div className="flex justify-between items-center mb-1">
                                 <Link href={`/events/${event.id}`} className="font-semibold hover:underline truncate">{event.title}</Link>
-                                <span className="text-sm font-medium text-muted-foreground">{registrations} / {capacity}</span>
+                                <span className="text-sm font-medium text-muted-foreground">
+                                    {registrations} / {capacity === Infinity ? '∞' : capacity}
+                                </span>
                             </div>
                             <Progress value={progress} />
                             <p className="text-xs text-muted-foreground mt-1">{format(event.date, "MMM d, p")}</p>

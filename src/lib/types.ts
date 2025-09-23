@@ -41,10 +41,10 @@ export interface Event {
     type: "physical" | "online";
     details: string; // Address or URL
   };
+  capacity: number; // Can be Infinity for online events
   tickets: {
     tier: string;
     price: number;
-    quantity: number;
   }[];
   organizerId: string;
   coverImage: string;

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, useContext } from "react";
@@ -59,7 +60,7 @@ export default function NewEventPage() {
   const [venueDetails, setVenueDetails] = useState("Some place cool");
   const [ticketTier, setTicketTier] = useState("General Admission");
   const [ticketPrice, setTicketPrice] = useState(0);
-  const [ticketQuantity, setTicketQuantity] = useState(100);
+  const [venueCapacity, setVenueCapacity] = useState(100);
   const [eventType, setEventType] = useState<"free" | "paid">("paid");
   const [isPublishing, setIsPublishing] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -77,6 +78,16 @@ export default function NewEventPage() {
     }
   }, [eventType, ticketPrice]);
   
+  useEffect(() => {
+    if (venueType === 'online') {
+      setVenueCapacity(Infinity);
+    } else {
+      if (venueCapacity === Infinity) {
+        setVenueCapacity(100); // Reset to a default value
+      }
+    }
+  }, [venueType, venueCapacity]);
+
   const handleFileChange = (file: File | null) => {
     if (file) {
       const reader = new FileReader();
@@ -116,11 +127,11 @@ export default function NewEventPage() {
         type: venueType,
         details: venueDetails,
       },
+      capacity: venueType === 'online' ? Infinity : venueCapacity,
       tickets: [
         {
           tier: ticketTier,
           price: eventType === 'free' ? 0 : Number(ticketPrice),
-          quantity: Number(ticketQuantity),
         },
       ],
       organizerId: user.id,
@@ -393,15 +404,15 @@ export default function NewEventPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ticket-quantity">Quantity</Label>
+              <Label htmlFor="venue-capacity">Venue Capacity</Label>
               <Input
-                id="ticket-quantity"
+                id="venue-capacity"
                 type="number"
                 placeholder="e.g., 500"
-                value={ticketQuantity}
-                onChange={(e) => setTicketQuantity(Number(e.target.value))}
+                value={venueCapacity}
+                onChange={(e) => setVenueCapacity(Number(e.target.value))}
                 required
-                disabled={isPublishing}
+                disabled={isPublishing || venueType === 'online'}
               />
             </div>
           </div>
