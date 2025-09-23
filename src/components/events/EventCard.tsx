@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -71,5 +72,3 @@ export function EventCard({ event }: EventCardProps) {
     </Link>
   );
 }
-
-    
