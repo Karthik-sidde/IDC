@@ -235,7 +235,7 @@ export default function LoginPage() {
 
 
   return (
-    <Card className="w-full max-w-md glass min-h-[720px]">
+    <Card className="w-full max-w-md glass">
       <Tabs defaultValue="login" className="w-full">
         <CardHeader>
           <div className="mx-auto mb-4">
@@ -246,7 +246,7 @@ export default function LoginPage() {
             <TabsTrigger value="register">Create Account</TabsTrigger>
           </TabsList>
         </CardHeader>
-        <TabsContent value="login">
+        <TabsContent value="login" className="min-h-[510px]">
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <CardDescription className="text-center">
@@ -321,7 +321,7 @@ export default function LoginPage() {
             </CardFooter>
           </form>
         </TabsContent>
-        <TabsContent value="register">
+        <TabsContent value="register" className="min-h-[510px]">
           <form onSubmit={handleSubmit(handleRegister)}>
             <CardContent className="space-y-4">
               <CardDescription className="text-center">
