@@ -9,8 +9,23 @@ const Node = ({ x, y, delay }: { x: string; y: string; delay: number }) => (
     className="absolute h-3 w-3 rounded-full bg-primary shadow-[0_0_12px_theme(colors.primary/80%)]"
     style={{ left: x, top: y }}
     initial={{ scale: 0, opacity: 0 }}
-    animate={{ scale: [0, 1.2, 1], opacity: 1 }}
-    transition={{ duration: 0.5, delay, ease: "circOut" }}
+    animate={{ 
+        scale: [0, 1.2, 1], 
+        opacity: 1,
+        y: [0, -5, 0], // floating effect
+    }}
+    transition={{ 
+        duration: 0.5, 
+        delay, 
+        ease: "circOut",
+        y: {
+            delay: delay + 0.5,
+            duration: 2.5,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: "easeInOut"
+        }
+    }}
   />
 );
 
