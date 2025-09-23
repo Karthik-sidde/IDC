@@ -197,6 +197,12 @@ export default function LoginPage() {
   });
 
   const passwordValue = watch("password");
+  
+  const handleRedirect = () => {
+    const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
+    sessionStorage.removeItem('redirectAfterLogin');
+    router.push(redirectPath);
+  }
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,9 +211,7 @@ export default function LoginPage() {
     setTimeout(() => {
       login(loginEmail);
       setIsLoginLoading(false);
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/events';
-      sessionStorage.removeItem('redirectAfterLogin');
-      router.push(redirectPath);
+      handleRedirect();
     }, 1000);
   };
   
@@ -233,6 +237,19 @@ export default function LoginPage() {
         router.push(`/verify-email?email=${data.email}`);
     }, 1500)
   };
+  
+  const handleGoogleLogin = () => {
+      setIsLoginLoading(true);
+      setTimeout(() => {
+          login("alex.doe@example.com"); // Use mock user for demo
+          setIsLoginLoading(false);
+          toast({
+              title: "Logged In!",
+              description: "You have successfully signed in with Google.",
+          });
+          handleRedirect();
+      }, 1000);
+  }
 
 
   return (
@@ -249,7 +266,8 @@ export default function LoginPage() {
         </CardHeader>
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
+           <ScrollArea className="h-[420px] w-full">
+            <CardContent className="space-y-4 pr-6">
               <CardDescription className="text-center">
                 Welcome back! Sign in to continue.
               </CardDescription>
@@ -259,8 +277,8 @@ export default function LoginPage() {
                   <CodebasicsIcon className="mr-2 h-5 w-5" />
                   Continue with Codebasics
                 </Button>
-                <Button variant="outline" className="w-full">
-                  <GoogleIcon className="mr-2 h-5 w-5" />
+                <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoginLoading}>
+                   {isLoginLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5" />}
                   Continue with Google
                 </Button>
                 <Button variant="outline" className="w-full">
@@ -304,6 +322,7 @@ export default function LoginPage() {
                 </div>
               </div>
             </CardContent>
+           </ScrollArea>
             <CardFooter className="flex flex-col gap-4">
               <Button
                 type="submit"
@@ -335,9 +354,9 @@ export default function LoginPage() {
                     <CodebasicsIcon className="mr-2 h-5 w-5" />
                     Continue with Codebasics
                     </Button>
-                    <Button variant="outline" className="w-full">
-                    <GoogleIcon className="mr-2 h-5 w-5" />
-                    Continue with Google
+                    <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoginLoading}>
+                      {isLoginLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5" />}
+                      Continue with Google
                     </Button>
                     <Button variant="outline" className="w-full">
                     <XIcon className="mr-2 h-5 w-5" />
@@ -420,3 +439,5 @@ export default function LoginPage() {
     </Card>
   );
 }
+
+    
