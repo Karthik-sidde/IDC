@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useContext } from "react";
@@ -20,7 +21,7 @@ import { AppLogo } from "@/components/AppLogo";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState("bernard.lane@example.com");
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login } = useContext(UserContext);
@@ -58,7 +59,7 @@ export default function AdminLoginPage() {
               <Input
                 id="login-email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="Enter your email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -74,7 +75,7 @@ export default function AdminLoginPage() {
                 id="login-password"
                 type="password"
                 required
-                defaultValue="password123"
+                placeholder="Enter your password"
                 className="pl-10"
               />
             </div>

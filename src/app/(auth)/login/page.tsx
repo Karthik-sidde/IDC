@@ -180,7 +180,7 @@ export default function LoginPage() {
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
 
-  const [loginEmail, setLoginEmail] = useState("alex.doe@example.com");
+  const [loginEmail, setLoginEmail] = useState("");
   const router = useRouter();
   const { login } = useContext(UserContext);
   const { toast } = useToast();
@@ -281,7 +281,7 @@ export default function LoginPage() {
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="m@example.com"
+                    placeholder="Enter your email"
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -297,7 +297,7 @@ export default function LoginPage() {
                     id="login-password"
                     type="password"
                     required
-                    defaultValue="password123"
+                    placeholder="Enter your password"
                     className="pl-10"
                   />
                 </div>
@@ -353,7 +353,7 @@ export default function LoginPage() {
                     name="name"
                     label="Name"
                     icon={<User />}
-                    placeholder="State your name"
+                    placeholder="Enter your name"
                     register={register}
                     errors={errors}
                     isDirty={!!dirtyFields.name}
@@ -364,7 +364,7 @@ export default function LoginPage() {
                     name="email"
                     label="Email"
                     icon={<AtSign />}
-                    placeholder="yourname@gmail.com"
+                    placeholder="Enter your email"
                     type="email"
                     register={register}
                     errors={errors}
@@ -376,7 +376,7 @@ export default function LoginPage() {
                     name="password"
                     label="Password"
                     icon={<KeyRound />}
-                    placeholder="Min. 8 characters"
+                    placeholder="Enter your password"
                     type="password"
                     register={register}
                     errors={errors}
@@ -388,7 +388,7 @@ export default function LoginPage() {
                     name="confirmPassword"
                     label="Re-enter Password"
                     icon={<KeyRound />}
-                    placeholder="Confirm your password"
+                    placeholder="Re-enter your password"
                     type="password"
                     register={register}
                     errors={errors}
