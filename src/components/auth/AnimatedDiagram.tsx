@@ -10,11 +10,13 @@ const Orbit = ({
   radius,
   duration,
   delay = 0,
+  ease = "linear",
 }: {
   children: React.ReactNode;
   radius: number;
   duration: number;
   delay?: number;
+  ease?: any;
 }) => (
   <motion.div
     className="absolute top-1/2 left-1/2"
@@ -28,7 +30,7 @@ const Orbit = ({
     animate={{ rotate: 360 }}
     transition={{
       duration,
-      ease: "linear",
+      ease,
       repeat: Infinity,
       delay,
     }}
@@ -100,8 +102,7 @@ export const AnimatedDiagram = () => {
         and accelerate your career in the data industry.
       </motion.p>
       <div className="relative mt-8 h-80 w-80">
-        {/* Body 1 */}
-        <Orbit radius={80} duration={12}>
+        <Orbit radius={80} duration={8} ease="easeInOut">
           <Node
             x="0%"
             y="50%"
@@ -111,9 +112,8 @@ export const AnimatedDiagram = () => {
           />
         </Orbit>
 
-        {/* Body 2 */}
-        <Orbit radius={120} duration={18}>
-          <Node
+        <Orbit radius={120} duration={10} ease="easeInOut">
+           <Node
             x="20%"
             y="20%"
             delay={0.6}
@@ -122,9 +122,8 @@ export const AnimatedDiagram = () => {
           />
         </Orbit>
 
-        {/* Body 3 */}
-        <Orbit radius={150} duration={25}>
-          <Node
+        <Orbit radius={150} duration={12} ease="easeInOut">
+           <Node
             x="100%"
             y="50%"
             delay={0.7}
