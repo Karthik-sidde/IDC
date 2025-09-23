@@ -37,7 +37,6 @@ import { useState, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/context/UserContext';
 import { type Ticket as TicketType, type Event, type User, type Speaker } from '@/lib/types';
-import { LoginDialog } from '@/components/auth/LoginDialog';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 
@@ -97,7 +96,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [event, setEvent] = useState<Event | undefined>(undefined);
   const [isRegistered, setIsRegistered] = useState(false);
   const [attendees, setAttendees] = useState<User[]>([]);
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [selectedFreeTier, setSelectedFreeTier] = useState<string | null>(null);
 
   useEffect(() => {
@@ -134,7 +132,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const handleRegisterClick = (tier: { tier: string; price: number; }) => {
     if (!user) {
         sessionStorage.setItem('redirectAfterLogin', pathname);
-        setIsLoginDialogOpen(true);
+        router.push('/login');
     } else if (tier.price === 0) {
         setSelectedFreeTier(tier.tier);
     } else {
@@ -168,13 +166,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
     setSelectedFreeTier(null);
   };
-
-  const onLoginSuccess = () => {
-    toast({
-        title: "Logged In!",
-        description: "You can now register for the event.",
-    });
-  }
 
   const RegisterButton = ({ tier }: { tier: { tier: string, price: number }}) => {
     const isFree = tier.price === 0;
@@ -376,11 +367,6 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
         </div>
       </div>
-       <LoginDialog 
-        open={isLoginDialogOpen} 
-        onOpenChange={setIsLoginDialogOpen}
-        onLoginSuccess={onLoginSuccess}
-      />
     </div>
   );
 }
