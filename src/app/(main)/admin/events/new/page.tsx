@@ -36,7 +36,7 @@ export default function NewEventPage() {
   const { toast } = useToast();
   const [title, setTitle] = useState("My Awesome Event");
   const [description, setDescription] = useState("This is a description of my awesome event.");
-  const [category, setCategory] = useState("tech");
+  const [chapter, setChapter] = useState("Bangalore");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
   const [venueType, setVenueType] = useState<"physical" | "online">("physical");
   const [venueDetails, setVenueDetails] = useState("Some place cool");
@@ -65,7 +65,7 @@ export default function NewEventPage() {
       id: `event-${Date.now()}`,
       title,
       description,
-      category,
+      chapter,
       date: new Date(date),
       venue: {
         type: venueType,
@@ -80,6 +80,7 @@ export default function NewEventPage() {
       ],
       organizerId: user.id,
       coverImage: `https://picsum.photos/seed/event${Date.now()}/600/400`,
+      speakers: [],
     };
 
     addMockEvent(newEvent);
@@ -147,22 +148,20 @@ export default function NewEventPage() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="chapter">Chapter</Label>
               <Select
-                onValueChange={(value) => setCategory(value)}
-                value={category}
+                onValueChange={(value) => setChapter(value)}
+                value={chapter}
                 required
               >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
+                <SelectTrigger id="chapter">
+                  <SelectValue placeholder="Select chapter" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tech">Tech</SelectItem>
-                  <SelectItem value="music">Music</SelectItem>
-                  <SelectItem value="arts">Arts</SelectItem>
-                  <SelectItem value="business">Business</SelectItem>
-                  <SelectItem value="lifestyle">Lifestyle</SelectItem>
-                  <SelectItem value="food">Food</SelectItem>
+                  <SelectItem value="Bangalore">Bangalore</SelectItem>
+                  <SelectItem value="Hyderabad">Hyderabad</SelectItem>
+                  <SelectItem value="Mumbai">Mumbai</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>

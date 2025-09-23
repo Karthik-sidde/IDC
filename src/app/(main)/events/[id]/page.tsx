@@ -216,7 +216,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
             <h1 className="font-headline text-3xl font-bold text-white md:text-5xl">
               {event.title}
             </h1>
-            <Badge className="mt-2 text-base">{event.category}</Badge>
+            <Badge className="mt-2 text-base">{event.chapter} Chapter</Badge>
           </div>
         </div>
       </Card>

@@ -117,7 +117,7 @@ const mockEvents: Event[] = [
     id: "event-1",
     title: "Future of Web3 Summit",
     description: "An immersive conference exploring the future of decentralized technologies, blockchain, and Web3. This summit brings together the brightest minds and leading voices in the decentralized space. Attendees will have the opportunity to participate in hands-on workshops, listen to visionary keynotes from industry pioneers, and network with a global community of developers, investors, and enthusiasts. Whether you're a seasoned expert or new to the world of Web3, this event will provide valuable insights and connections to help you navigate the next wave of the internet.",
-    category: "Tech",
+    chapter: "Bangalore",
     date: addDays(new Date(), 15),
     venue: {
       type: "physical",
@@ -132,7 +132,7 @@ const mockEvents: Event[] = [
     id: "event-2",
     title: "Starlight Music Festival",
     description: "A 3-day outdoor music festival featuring top artists from around the globe. Experience music, art, and community under the stars.",
-    category: "Music",
+    chapter: "Mumbai",
     date: addDays(new Date(), 45),
     venue: {
       type: "physical",
@@ -150,7 +150,7 @@ const mockEvents: Event[] = [
     id: "event-3",
     title: "Modern Art Exhibition: 'Dimensions'",
     description: "A gallery opening showcasing contemporary artists who push the boundaries of form and dimension. Wine and cheese will be served.",
-    category: "Arts",
+    chapter: "Hyderabad",
     date: addDays(new Date(), 5),
     venue: {
       type: "physical",
@@ -165,7 +165,7 @@ const mockEvents: Event[] = [
     id: "event-4",
     title: "Innovate & Pitch Night",
     description: "Watch the brightest startups pitch their ideas to a panel of venture capitalists. Network with founders and investors.",
-    category: "Business",
+    chapter: "Other",
     date: addDays(new Date(), 22),
     venue: {
       type: "online",
@@ -180,7 +180,7 @@ const mockEvents: Event[] = [
     id: "event-5",
     title: "Sustainable Living Workshop",
     description: "A hands-on workshop to learn about sustainable practices, from urban gardening to zero-waste living. All materials provided.",
-    category: "Lifestyle",
+    chapter: "Bangalore",
     date: subDays(new Date(), 10),
     venue: {
       type: "physical",
@@ -195,7 +195,7 @@ const mockEvents: Event[] = [
     id: "event-6",
     title: "Global Food Fair",
     description: "Taste the world at our annual food fair, featuring dozens of vendors with authentic cuisine from every continent.",
-    category: "Food",
+    chapter: "Mumbai",
     date: subDays(new Date(), 30),
     venue: {
       type: "physical",

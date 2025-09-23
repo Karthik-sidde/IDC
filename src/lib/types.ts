@@ -35,7 +35,7 @@ export interface Event {
   id:string;
   title: string;
   description: string;
-  category: string;
+  chapter: string;
   date: Date;
   venue: {
     type: "physical" | "online";

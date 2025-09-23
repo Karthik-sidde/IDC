@@ -75,13 +75,13 @@ export default function EventsPage() {
         <div className="flex gap-2">
             <Select>
                 <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by category" />
+                    <SelectValue placeholder="Filter by chapter" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="tech">Tech</SelectItem>
-                    <SelectItem value="music">Music</SelectItem>
-                    <SelectItem value="arts">Arts</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
+                    <SelectItem value="bangalore">Bangalore</SelectItem>
+                    <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                    <SelectItem value="mumbai">Mumbai</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
             </Select>
 
