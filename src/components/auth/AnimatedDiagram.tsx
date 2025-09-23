@@ -98,6 +98,16 @@ export const AnimatedDiagram = () => {
             <Node x="100%" y="70%" delay={0.9} />
             <Node x="50%" y="100%" delay={1.0} />
 
+            {/* Connectors as traveling light beams */}
+            <Connector x1={size*0.5} y1={size*0} x2={size*0.15} y2={size*0.25} delay={1.2} />
+            <Connector x1={size*0.15} y1={size*0.25} x2={size*0} y2={size*0.7} delay={1.4} />
+            <Connector x1={size*0} y1={size*0.7} x2={size*0.3} y2={size*0.7} delay={1.6} />
+            <Connector x1={size*0.3} y1={size*0.7} x2={size*0.5} y2={size*1} delay={1.8} />
+            <Connector x1={size*0.5} y1={size*1} x2={size*0.7} y2={size*0.7} delay={2.0} />
+            <Connector x1={size*0.7} y1={size*0.7} x2={size*1} y2={size*0.7} delay={2.2} />
+            <Connector x1={size*1} y1={size*0.7} x2={size*0.85} y2={size*0.25} delay={2.4} />
+            <Connector x1={size*0.85} y1={size*0.25} x2={size*0.5} y2={size*0} delay={2.6} />
+
         </div>
     </div>
   );
