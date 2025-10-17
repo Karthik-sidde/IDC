@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { type Event } from "@/lib/types";
+import { motion } from "framer-motion";
 
 type SortOption = "date-asc" | "date-desc" | "title-asc";
 
@@ -63,6 +64,28 @@ export default function EventsPage() {
     const allChapters = events.map(e => e.chapter);
     return [...new Set(allChapters)];
   }, [events]);
+  
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+      },
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -114,11 +137,18 @@ export default function EventsPage() {
       </div>
 
       {filteredAndSortedEvents.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <motion.div 
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
             {filteredAndSortedEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <motion.div key={event.id} variants={itemVariants}>
+                    <EventCard event={event} />
+                </motion.div>
             ))}
-        </div>
+        </motion.div>
       ) : (
         <div className="text-center py-16 text-muted-foreground">
             <p className="text-lg font-semibold">No events found</p>
