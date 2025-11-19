@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { EventCard } from "@/components/events/EventCard";
-import { getMockEvents } from "@/lib/mock-data";
+import { getPayloadEvents } from "@/lib/payload-client";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -26,7 +26,11 @@ export default function EventsPage() {
   const [sortOption, setSortOption] = useState<SortOption>("date-asc");
 
   useEffect(() => {
-    setEvents(getMockEvents());
+    async function fetchEvents() {
+        const fetchedEvents = await getPayloadEvents();
+        setEvents(fetchedEvents);
+    }
+    fetchEvents();
   }, []);
 
   const filteredAndSortedEvents = useMemo(() => {
