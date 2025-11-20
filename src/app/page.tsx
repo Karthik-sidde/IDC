@@ -265,9 +265,6 @@ const HomePageContent = () => {
         {/* Contact Section */}
         <footer className="py-8 px-4 text-center bg-background">
             <p className="text-muted-foreground">Have questions? Reach out to us at <a href="mailto:hello@indiandataclub.com" className="text-primary hover:underline">hello@indiandataclub.com</a></p>
-             <div className="text-center text-sm text-muted-foreground mt-4">
-              <Link href="/admin/login" className="hover:text-primary transition-colors">Admin Portal</Link>
-            </div>
             <p className="text-xs text-muted-foreground mt-4">&copy; {new Date().getFullYear()} Indian Data Club. All Rights Reserved.</p>
         </footer>
       </div>

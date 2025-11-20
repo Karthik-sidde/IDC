@@ -19,17 +19,10 @@ import { AppLogo } from "@/components/AppLogo";
 import { UserNav } from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
-  LayoutDashboard,
   Calendar,
   Ticket,
-  Users,
-  QrCode,
-  Settings,
   LogOut,
-  ChevronRight,
-  Shield,
   LogIn,
-  Mic,
   FileCheck,
   AlertCircle,
 } from "lucide-react";
@@ -60,7 +53,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       label: "Browse Events",
     },
     {
-      role: ["user", "speaker"],
+      role: ["user", "speaker", "admin", "super_admin"],
       href: "/my-events",
       icon: Ticket,
       label: "My Tickets",
@@ -72,73 +65,19 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       label: "Become a Speaker",
       condition: (user: any) => user?.verificationStatus !== 'approved',
     },
-    {
-      role: ["admin", "super_admin", "speaker"],
-      href: "/admin/events/new",
-      icon: Mic,
-      label: "Create Event",
-      group: "Hosting",
-      condition: (user: any) => user?.role.includes('admin') || user?.verificationStatus === 'approved',
-    },
-    {
-      role: ["admin", "super_admin"],
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      group: "Admin",
-    },
-    {
-      role: ["admin", "super_admin"],
-      href: "/admin/events",
-      icon: Calendar,
-      label: "Manage Events",
-      group: "Admin",
-    },
-    {
-      role: ["admin", "super_admin"],
-      href: "/admin/scanner",
-      icon: QrCode,
-      label: "Check-in Scanner",
-      group: "Admin",
-    },
-    {
-      role: ["super_admin"],
-      href: "/admin/users",
-      icon: Users,
-      label: "Manage Users",
-      group: "Super Admin",
-    },
-     {
-      role: ["super_admin"],
-      href: "/admin/platform-settings",
-      icon: Shield,
-      label: "Platform Settings",
-      group: "Super Admin",
-    },
   ];
 
   const currentUserRole = user?.role || "guest";
 
   const userMenu = menuItems.filter(
-    (item) => !item.group && item.role.includes(currentUserRole) && (!item.condition || item.condition(user))
-  );
-  const hostingMenu = menuItems.filter(
-    (item) => item.group === "Hosting" && user && item.role.includes(user.role) && (!item.condition || item.condition(user))
-  );
-  const adminMenu = menuItems.filter(
-    (item) => item.group === "Admin" && user && item.role.includes(user.role)
-  );
-  const superAdminMenu = menuItems.filter(
-    (item) => item.group === "Super Admin" && user && item.role.includes(user.role)
+    (item) => item.role.includes(currentUserRole) && (!item.condition || item.condition(user))
   );
   
   const getPageTitle = () => {
     if (pathname === '/') return 'Home';
-    // Special case for profile setup
     if (pathname === '/profile-setup') return 'Create Your Profile';
 
-    const allMenus = [...userMenu, ...hostingMenu, ...adminMenu, ...superAdminMenu];
-    const activeItem = allMenus.find(item => pathname.startsWith(item.href) && item.href !== '/');
+    const activeItem = userMenu.find(item => pathname.startsWith(item.href) && item.href !== '/');
     return activeItem?.label || "Events";
   }
 
@@ -177,65 +116,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </SidebarMenu>
           </SidebarGroup>
           
-          {hostingMenu.length > 0 && (
-             <SidebarGroup>
-                <SidebarGroupLabel className="font-headline">Hosting</SidebarGroupLabel>
-                 <SidebarMenu>
-                    {hostingMenu.map((item) => (
-                        <SidebarMenuItem key={item.href}>
-                            <SidebarMenuButton
-                            onClick={() => router.push(item.href)}
-                            isActive={pathname.startsWith(item.href)}
-                            tooltip={item.label}
-                            >
-                                <item.icon />
-                                <span>{item.label}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroup>
-          )}
-
-          {adminMenu.length > 0 && (
-            <SidebarGroup>
-              <SidebarGroupLabel className="font-headline">Admin</SidebarGroupLabel>
-              <SidebarMenu>
-                {adminMenu.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      onClick={() => router.push(item.href)}
-                      isActive={pathname.startsWith(item.href)}
-                      tooltip={item.label}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroup>
-          )}
-
-          {superAdminMenu.length > 0 && (
-            <SidebarGroup>
-              <SidebarGroupLabel className="font-headline">Super Admin</SidebarGroupLabel>
-              <SidebarMenu>
-                {superAdminMenu.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      onClick={() => router.push(item.href)}
-                      isActive={pathname.startsWith(item.href)}
-                      tooltip={item.label}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroup>
-          )}
         </SidebarContent>
         <SidebarFooter>
           {user && (
@@ -259,6 +139,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open('http://localhost:3000/admin', '_blank')}
+            >
+              CMS Admin
+            </Button>
             <ThemeToggle />
             {user ? (
               <UserNav />
@@ -287,5 +174,3 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     </SidebarProvider>
   );
 }
-
-    
