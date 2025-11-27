@@ -31,6 +31,12 @@ export default function EventsPage() {
         setEvents(fetchedEvents);
     }
     fetchEvents();
+
+    // Set up polling to fetch events every 15 seconds
+    const intervalId = setInterval(fetchEvents, 15000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   const filteredAndSortedEvents = useMemo(() => {
