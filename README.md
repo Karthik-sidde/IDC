@@ -21,12 +21,7 @@ This document outlines the technical specifications, architecture, and features 
 
 ### **Backend (Headless CMS)**
 
-The backend is a separate, self-contained Payload CMS application located in the `payload-cms/` directory.
-
-*   **Platform**: Payload CMS
-*   **Database**: MongoDB (configured via `payload-cms/src/payload.config.ts`)
-*   **Authentication**: Payload's built-in authentication for CMS admin users.
-*   **API**: Automatically generated REST and GraphQL APIs that the frontend consumes.
+The backend is a **separate, externally hosted Payload CMS application**. The frontend consumes its REST API to fetch all content. Ensure your `.env` file contains the correct `NEXT_PUBLIC_PAYLOAD_URL` pointing to your live CMS instance.
 
 ---
 
@@ -56,22 +51,8 @@ The backend is a separate, self-contained Payload CMS application located in the
 
 ### **How to Run This Project**
 
-There are two separate applications to run: the **Frontend** and the **Backend (CMS)**.
+1.  **Configure Environment**: Create a `.env` file in the root directory and add `NEXT_PUBLIC_PAYLOAD_URL=<your_payload_cms_url>`.
+2.  **Install Dependencies**: Open a terminal and run `npm install`.
+3.  **Start the Development Server**: Run `npm run dev`.
+4.  Your frontend is now running at `http://localhost:9002`.
 
-#### **1. Running the Backend (Payload CMS)**
-
-1.  Open a **new terminal**.
-2.  Navigate to the CMS directory: `cd payload-cms`
-3.  Install dependencies: `npm install`
-4.  Start the server: `npm run dev`
-5.  Your CMS is now running at `http://localhost:3000`. You can access the admin panel at `http://localhost:3000/admin`.
-
-#### **2. Running the Frontend (Next.js)**
-
-1.  Open another terminal.
-2.  If you are not in the root directory, navigate back to it.
-3.  Install dependencies: `npm install`
-4.  Start the development server: `npm run dev`
-5.  Your frontend is now running at `http://localhost:9002`.
-
-You can now use the website and manage its content through the CMS simultaneously.
