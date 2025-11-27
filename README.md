@@ -25,15 +25,6 @@ The backend is a **separate, externally hosted Payload CMS application**. The fr
 
 ---
 
-### **Generative AI**
-
-*   **Framework**: Genkit
-*   **Provider**: Google AI
-*   **Model**: Gemini 2.5 Flash
-*   **Feature**: Personalized event recommendations based on user history and preferences, implemented in `src/ai/flows/`.
-
----
-
 ### **Key Application Features**
 
 *   **Headless Content Management**: All content (events, speakers, media) is managed through a user-friendly Payload CMS admin panel.
@@ -44,7 +35,6 @@ The backend is a **separate, externally hosted Payload CMS application**. The fr
 *   **User Profiles & Dashboards**:
     *   **My Tickets**: A dedicated page for users to view their upcoming and past event tickets.
     *   **Profile Management**: Users can update their personal information, bio, and social media links.
-*   **AI-Powered Recommendations**: A Genkit flow provides personalized event suggestions to users.
 *   **Responsive Design**: The application is fully responsive and designed to work seamlessly across desktop, tablet, and mobile devices.
 
 ---
