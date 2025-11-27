@@ -139,13 +139,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open('http://localhost:3000/admin', '_blank')}
-            >
-              CMS Admin
-            </Button>
             <ThemeToggle />
             {user ? (
               <UserNav />

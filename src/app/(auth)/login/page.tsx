@@ -332,18 +332,6 @@ export default function LoginPage() {
                 {isLoginLoading ? <Loader2 className="animate-spin" /> : <LogIn />}
                 <span>Sign In</span>
               </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Go to the{' '}
-                <a
-                  href="http://localhost:3000/admin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  CMS Admin Panel
-                </a>{' '}
-                to manage content.
-              </p>
             </CardFooter>
           </form>
         </TabsContent>
